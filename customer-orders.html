@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mukoto Avenue — My Orders</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232E7D32' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' dominant-baseline='middle'>🛍️</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      background: #FAFAFA;
+      font-family: 'Inter', sans-serif;
+      padding-bottom: 90px;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(160deg, #2E7D32 0%, #1B5E20 100%);
+      padding: 52px 20px 20px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-row {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 16px;
+    }
+    .header-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 22px; font-weight: 800; color: white;
+    }
+    .header-sub {
+      font-size: 13px; color: rgba(255,255,255,0.7);
+    }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex; gap: 6px;
+      overflow-x: auto; scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab {
+      padding: 8px 16px; border-radius: 999px;
+      font-size: 12px; font-weight: 700;
+      white-space: nowrap; cursor: pointer;
+      border: 1.5px solid rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.1);
+      transition: all 0.2s; flex-shrink: 0;
+    }
+    .tab.active {
+      background: white; color: #2E7D32;
+      border-color: white;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    }
+
+    /* ── Orders list ── */
+    .orders-list {
+      padding: 16px 16px 0;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+
+    /* Order card */
+    .order-card {
+      background: white; border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.08);
+      animation: slideIn 0.35s ease both;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .order-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Card top color strip based on status */
+    .order-card-strip {
+      height: 4px; width: 100%;
+    }
+    .strip-pending   { background: linear-gradient(90deg, #F9A825, #FFD54F); }
+    .strip-confirmed { background: linear-gradient(90deg, #1565C0, #42A5F5); }
+    .strip-fulfilled { background: linear-gradient(90deg, #2E7D32, #66BB6A); }
+    .strip-cancelled { background: linear-gradient(90deg, #EF5350, #EF9A9A); }
+
+    .order-card-body { padding: 16px; }
+
+    /* Card header row */
+    .card-header {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; margin-bottom: 12px;
+    }
+    .order-num {
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px; font-weight: 800; color: #1A1A1A;
+    }
+    .order-date { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
+
+    .status-badge {
+      padding: 4px 10px; border-radius: 999px;
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    .badge-pending   { background: #fffde7; color: #F57F17; }
+    .badge-confirmed { background: #e3f2fd; color: #1565C0; }
+    .badge-fulfilled { background: #e8f5e9; color: #2E7D32; }
+    .badge-cancelled { background: #fef2f2; color: #EF5350; }
+
+    /* Items preview */
+    .items-preview {
+      display: flex; gap: 8px;
+      margin-bottom: 12px; overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .items-preview::-webkit-scrollbar { display: none; }
+    .item-thumb {
+      width: 52px; height: 52px; border-radius: 12px;
+      background: #F3F4F6; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; overflow: hidden; position: relative;
+    }
+    .item-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .item-thumb-more {
+      width: 52px; height: 52px; border-radius: 12px;
+      background: #F3F4F6; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: #6B7280;
+    }
+
+    /* Card footer */
+    .card-footer {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding-top: 12px;
+      border-top: 1px solid #F3F4F6;
+    }
+    .vendor-row {
+      display: flex; align-items: center; gap: 7px;
+    }
+    .vendor-mini-avatar {
+      width: 24px; height: 24px; border-radius: 8px;
+      background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+    }
+    .vendor-mini-name { font-size: 12px; font-weight: 600; color: #374151; }
+
+    .order-total {
+      font-family: 'Poppins', sans-serif;
+      font-size: 16px; font-weight: 800; color: #2E7D32;
+    }
+
+    /* ── Order detail sheet ── */
+    .sheet-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 200; opacity: 0;
+      pointer-events: none; transition: opacity 0.3s;
+    }
+    .sheet-overlay.show { opacity: 1; pointer-events: all; }
+
+    .detail-sheet {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: white; border-radius: 24px 24px 0 0;
+      z-index: 300; padding: 0 20px 40px;
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+      max-height: 88vh; overflow-y: auto; scrollbar-width: none;
+    }
+    .detail-sheet::-webkit-scrollbar { display: none; }
+    .detail-sheet.show { transform: translateY(0); }
+
+    .sheet-handle {
+      width: 40px; height: 4px; background: #E5E7EB;
+      border-radius: 999px; margin: 14px auto 20px;
+    }
+
+    .sheet-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 18px; font-weight: 800; color: #1A1A1A;
+      margin-bottom: 4px;
+    }
+    .sheet-sub { font-size: 13px; color: #9CA3AF; margin-bottom: 20px; }
+
+    /* Stepper in sheet */
+    .stepper { display: flex; flex-direction: column; }
+    .step-row { display: flex; gap: 14px; }
+    .step-left {
+      display: flex; flex-direction: column;
+      align-items: center; width: 28px; flex-shrink: 0;
+    }
+    .step-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; flex-shrink: 0;
+    }
+    .step-dot.done { background: #2E7D32; color: white; }
+    .step-dot.active {
+      background: #F9A825; color: white;
+      animation: pulseDot 2s ease-in-out infinite;
+    }
+    .step-dot.pending { background: #E5E7EB; color: #9CA3AF; }
+    .step-line {
+      width: 2px; flex: 1; min-height: 20px;
+      background: #E5E7EB; margin: 2px 0;
+    }
+    .step-line.done { background: #2E7D32; }
+    .step-content { flex: 1; padding: 3px 0 18px; }
+    .step-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px; font-weight: 700; color: #1A1A1A;
+    }
+    .step-name.muted { color: #9CA3AF; }
+    .step-name.gold  { color: #F9A825; }
+    .step-ts { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
+
+    /* Sheet items */
+    .sheet-items { margin: 16px 0; display: flex; flex-direction: column; gap: 10px; }
+    .sheet-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px; background: #F9FAFB; border-radius: 12px;
+    }
+    .sheet-item-img {
+      width: 46px; height: 46px; border-radius: 10px;
+      background: #E5E7EB;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; overflow: hidden; flex-shrink: 0;
+    }
+    .sheet-item-img img { width: 100%; height: 100%; object-fit: cover; }
+    .sheet-item-name { flex: 1; font-size: 13px; font-weight: 600; color: #1A1A1A; }
+    .sheet-item-qty { font-size: 12px; color: #9CA3AF; }
+    .sheet-item-price { font-size: 13px; font-weight: 800; color: #2E7D32; }
+
+    /* Sheet total */
+    .sheet-total {
+      display: flex; justify-content: space-between;
+      padding: 14px; background: #F0FDF4;
+      border-radius: 12px; margin-bottom: 16px;
+    }
+    .sheet-total-label {
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px; font-weight: 700; color: #1A1A1A;
+    }
+    .sheet-total-val {
+      font-family: 'Poppins', sans-serif;
+      font-size: 18px; font-weight: 800; color: #2E7D32;
+    }
+
+    /* Sheet actions */
+    .sheet-actions { display: flex; gap: 10px; }
+    .sheet-btn-primary {
+      flex: 2; padding: 14px; border-radius: 12px; border: none;
+      background: linear-gradient(135deg, #2E7D32, #1B5E20);
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+      box-shadow: 0 4px 14px rgba(46,125,50,0.3);
+    }
+    .sheet-btn-primary:hover { transform: translateY(-1px); }
+    .sheet-btn-secondary {
+      flex: 1; padding: 14px; border-radius: 12px;
+      border: 1.5px solid #E5E7EB; background: white;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px; font-weight: 700; color: #374151;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .sheet-btn-secondary:hover { border-color: #2E7D32; color: #2E7D32; }
+
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center; padding: 60px 20px; display: none;
+    }
+    .empty-state.show { display: block; }
+    .empty-emoji { font-size: 56px; margin-bottom: 14px; }
+    .empty-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 18px; font-weight: 800; color: #1A1A1A; margin-bottom: 8px;
+    }
+    .empty-desc { font-size: 14px; color: #9CA3AF; line-height: 1.6; margin-bottom: 24px; }
+    .btn-shop {
+      display: inline-block; padding: 14px 28px;
+      border-radius: 12px; border: none;
+      background: linear-gradient(135deg, #2E7D32, #1B5E20);
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px; font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 4px 16px rgba(46,125,50,0.3);
+    }
+
+    /* ── Skeleton ── */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite; border-radius: 16px;
+    }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+    /* ── Bottom nav ── */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: white; border-top: 1px solid #F3F4F6;
+      display: flex; padding: 10px 0 20px; z-index: 150;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+    }
+    .nav-item {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; gap: 3px;
+      cursor: pointer; text-decoration: none; padding: 4px 0;
+    }
+    .nav-icon { font-size: 22px; }
+    .nav-label { font-size: 10px; font-weight: 600; color: #9CA3AF; }
+    .nav-item.active .nav-label { color: #2E7D32; }
+    .nav-dot { width: 4px; height: 4px; background: #2E7D32; border-radius: 50%; display: none; }
+    .nav-item.active .nav-dot { display: block; }
+
+    @keyframes pulseDot {
+      0%,100% { box-shadow:0 0 0 3px rgba(249,168,37,0.2); }
+      50%      { box-shadow:0 0 0 7px rgba(249,168,37,0.1); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-row">
+      <div>
+        <div class="header-title">My Orders</div>
+        <div class="header-sub" id="orderSummaryText">Loading your orders...</div>
+      </div>
+    </div>
+    <div class="tabs">
+      <div class="tab active" id="tab-all"       onclick="switchTab('all')">All</div>
+      <div class="tab"        id="tab-pending"   onclick="switchTab('pending')">Pending</div>
+      <div class="tab"        id="tab-confirmed" onclick="switchTab('confirmed')">Confirmed</div>
+      <div class="tab"        id="tab-fulfilled" onclick="switchTab('fulfilled')">Fulfilled</div>
+      <div class="tab"        id="tab-cancelled" onclick="switchTab('cancelled')">Cancelled</div>
+    </div>
+  </div>
+
+  <!-- Orders list -->
+  <div class="orders-list" id="ordersList">
+    <div class="skeleton" style="height:160px;"></div>
+    <div class="skeleton" style="height:160px;"></div>
+    <div class="skeleton" style="height:160px;"></div>
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty-state" id="emptyState">
+    <div class="empty-emoji">📦</div>
+    <div class="empty-title">No orders yet</div>
+    <div class="empty-desc">You haven't placed any orders in this category. Start shopping to see them here.</div>
+    <a href="customer-home.html" class="btn-shop">Browse Products →</a>
+  </div>
+
+  <!-- Sheet overlay -->
+  <div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet()"></div>
+
+  <!-- Detail sheet -->
+  <div class="detail-sheet" id="detailSheet">
+    <div class="sheet-handle"></div>
+    <div id="sheetContent"></div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <a href="customer-home.html" class="nav-item">
+      <div class="nav-icon">🏠</div><div class="nav-label">Home</div><div class="nav-dot"></div>
+    </a>
+    <a href="customer-map.html" class="nav-item">
+      <div class="nav-icon">🗺️</div><div class="nav-label">Map</div><div class="nav-dot"></div>
+    </a>
+    <a href="customer-orders.html" class="nav-item active">
+      <div class="nav-icon">📦</div><div class="nav-label">Orders</div><div class="nav-dot"></div>
+    </a>
+    <a href="shared-chat-list.html" class="nav-item">
+      <div class="nav-icon">💬</div><div class="nav-label">Messages</div><div class="nav-dot"></div>
+    </a>
+    <a href="customer-profile.html" class="nav-item">
+      <div class="nav-icon">👤</div><div class="nav-label">Profile</div><div class="nav-dot"></div>
+    </a>
+  </nav>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getFirestore, collection, query,
+      where, orderBy, getDocs, doc, getDoc, updateDoc, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2vGB7iehqse--Th5wds1MoU4ZHr_DYY4",
+      authDomain: "mukoto-avenue-3758a.firebaseapp.com",
+      projectId: "mukoto-avenue-3758a",
+      storageBucket: "mukoto-avenue-3758a.firebasestorage.app",
+      messagingSenderId: "172793539743",
+      appId: "1:172793539743:web:46fae0bd5be1ecedebc6aa",
+      measurementId: "G-VN9T6FEVJ0"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    let currentUser = null;
+    let allOrders   = [];
+    let activeTab   = 'all';
+
+    // ── Auth guard ───────────────────────────────────────────────
+    onAuthStateChanged(auth, async user => {
+      if (!user) { window.location.href = 'login.html'; return; }
+      currentUser = user;
+      await loadOrders();
+    });
+
+    // ── Load orders ──────────────────────────────────────────────
+    async function loadOrders() {
+      try {
+        const q = query(
+          collection(db, 'orders'),
+          where('customerId', '==', currentUser.uid),
+          orderBy('createdAt', 'desc')
+        );
+        const snap = await getDocs(q);
+        allOrders  = [];
+        snap.forEach(d => allOrders.push({ id: d.id, ...d.data() }));
+        renderOrders(allOrders);
+        updateSummary();
+      } catch (err) {
+        // Fallback without orderBy if index not ready
+        try {
+          const q2   = query(collection(db, 'orders'), where('customerId', '==', currentUser.uid));
+          const snap2 = await getDocs(q2);
+          allOrders   = [];
+          snap2.forEach(d => allOrders.push({ id: d.id, ...d.data() }));
+          renderOrders(allOrders);
+          updateSummary();
+        } catch (e) {
+          console.error('Orders load error:', e);
+          renderOrders([]);
+        }
+      }
+    }
+
+    // ── Render orders ────────────────────────────────────────────
+    function renderOrders(orders) {
+      const filtered = activeTab === 'all'
+        ? orders
+        : orders.filter(o => o.orderStatus === activeTab);
+
+      const list = document.getElementById('ordersList');
+
+      if (!filtered.length) {
+        list.innerHTML = '';
+        document.getElementById('emptyState').classList.add('show');
+        return;
+      }
+
+      document.getElementById('emptyState').classList.remove('show');
+
+      list.innerHTML = filtered.map((order, i) => {
+        const status    = order.orderStatus || 'pending';
+        const stripClass = `strip-${status}`;
+        const badgeClass = `badge-${status}`;
+        const badgeLabel = { pending:'Pending', confirmed:'Confirmed', fulfilled:'Fulfilled', cancelled:'Cancelled' }[status] || status;
+        const total      = Number(order.totalAmount || 0).toFixed(2);
+        const date       = order.createdAt?.toDate
+          ? order.createdAt.toDate().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
+          : 'Recently';
+        const orderNum   = `MKT-${order.id.substring(0,6).toUpperCase()}`;
+
+        const items = order.items || [];
+        const thumbs = items.slice(0, 3).map(item => `
+          <div class="item-thumb">
+            ${item.image ? `<img src="${item.image}" onerror="this.style.display='none'">` : ''}
+            <span>${catEmoji(item.category)}</span>
+          </div>`).join('');
+        const moreThumb = items.length > 3
+          ? `<div class="item-thumb-more">+${items.length - 3}</div>`
+          : '';
+
+        return `
+          <div class="order-card" style="animation-delay:${i * 0.08}s"
+            onclick="openSheet('${order.id}')">
+            <div class="order-card-strip ${stripClass}"></div>
+            <div class="order-card-body">
+              <div class="card-header">
+                <div>
+                  <div class="order-num">#${orderNum}</div>
+                  <div class="order-date">${date}</div>
+                </div>
+                <div class="status-badge ${badgeClass}">${badgeLabel}</div>
+              </div>
+              <div class="items-preview">${thumbs}${moreThumb}</div>
+              <div class="card-footer">
+                <div class="vendor-row">
+                  <div class="vendor-mini-avatar">${catEmoji(items[0]?.category)}</div>
+                  <div class="vendor-mini-name">${order.vendorName || items[0]?.vendorName || 'Vendor'}</div>
+                </div>
+                <div class="order-total">$${total}</div>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    // ── Open detail sheet ────────────────────────────────────────
+    window.openSheet = function(orderId) {
+      const order  = allOrders.find(o => o.id === orderId);
+      if (!order) return;
+
+      const status   = order.orderStatus || 'pending';
+      const total    = Number(order.totalAmount || 0).toFixed(2);
+      const orderNum = `MKT-${order.id.substring(0,6).toUpperCase()}`;
+      const date     = order.createdAt?.toDate
+        ? order.createdAt.toDate().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
+        : 'Recently';
+      const items    = order.items || [];
+
+      const steps = [
+        { key:'placed',    label:'Order Placed',        desc:'Your order was received',          done: true },
+        { key:'confirmed', label:'Confirmed by Vendor', desc:'Vendor accepted your order',       done: ['confirmed','fulfilled'].includes(status), active: status === 'pending' },
+        { key:'ready',     label:'Ready for Pickup',    desc:'Your items are ready',             done: status === 'fulfilled', active: status === 'confirmed' },
+        { key:'fulfilled', label:'Fulfilled',           desc:'Order complete',                   done: status === 'fulfilled' }
+      ];
+
+      const stepHtml = steps.map((s, i) => {
+        const dotClass = s.done ? 'done' : (s.active ? 'active' : 'pending');
+        const icon     = s.done ? '✓' : (s.active ? '⏳' : (i+1));
+        const lineClass = s.done ? 'done' : '';
+        const showLine  = i < steps.length - 1;
+        return `
+          <div class="step-row">
+            <div class="step-left">
+              <div class="step-dot ${dotClass}">${icon}</div>
+              ${showLine ? `<div class="step-line ${lineClass}"></div>` : ''}
+            </div>
+            <div class="step-content">
+              <div class="step-name ${s.active ? 'gold' : (s.done ? '' : 'muted')}">${s.label}</div>
+              <div class="step-ts">${s.desc}</div>
+            </div>
+          </div>`;
+      }).join('');
+
+      const itemsHtml = items.map(item => `
+        <div class="sheet-item">
+          <div class="sheet-item-img">
+            ${item.image ? `<img src="${item.image}" onerror="this.style.display='none'">` : ''}
+            <span>${catEmoji(item.category)}</span>
+          </div>
+          <div class="sheet-item-name">${item.title || 'Product'}</div>
+          <div class="sheet-item-qty">×${item.qty || 1}</div>
+          <div class="sheet-item-price">$${(Number(item.price||0)*(item.qty||1)).toFixed(2)}</div>
+        </div>`).join('');
+
+      const canCancel  = status === 'pending';
+      const canReview  = status === 'fulfilled';
+
+      document.getElementById('sheetContent').innerHTML = `
+        <div class="sheet-title">#${orderNum}</div>
+        <div class="sheet-sub">${date} · ${order.paymentMethod || 'EcoCash'}</div>
+
+        <div class="stepper">${stepHtml}</div>
+
+        <div style="font-family:'Poppins',sans-serif;font-size:14px;font-weight:800;color:#1A1A1A;margin:16px 0 10px;">
+          🛍️ Items
+        </div>
+        <div class="sheet-items">${itemsHtml}</div>
+
+        <div class="sheet-total">
+          <div class="sheet-total-label">Total Paid</div>
+          <div class="sheet-total-val">$${total}</div>
+        </div>
+
+        <div class="sheet-actions">
+          <button class="sheet-btn-primary"
+            onclick="window.location.href='shared-chat-list.html'">
+            💬 Message Vendor
+          </button>
+          ${canCancel ? `
+            <button class="sheet-btn-secondary"
+              onclick="cancelOrder('${order.id}')">
+              Cancel
+            </button>` : ''}
+          ${canReview ? `
+            <button class="sheet-btn-secondary"
+              onclick="leaveReview('${order.id}')">
+              ⭐ Review
+            </button>` : ''}
+        </div>`;
+
+      document.getElementById('sheetOverlay').classList.add('show');
+      document.getElementById('detailSheet').classList.add('show');
+    };
+
+    window.closeSheet = function() {
+      document.getElementById('sheetOverlay').classList.remove('show');
+      document.getElementById('detailSheet').classList.remove('show');
+    };
+
+    // ── Cancel order ─────────────────────────────────────────────
+    window.cancelOrder = async function(orderId) {
+      if (!confirm('Cancel this order?')) return;
+      try {
+        await updateDoc(doc(db, 'orders', orderId), {
+          orderStatus: 'cancelled',
+          updatedAt: serverTimestamp()
+        });
+        closeSheet();
+        await loadOrders();
+      } catch (err) {
+        alert('Could not cancel order. Please try again.');
+      }
+    };
+
+    // ── Leave review ─────────────────────────────────────────────
+    window.leaveReview = function(orderId) {
+      localStorage.setItem('ma_review_order', orderId);
+      closeSheet();
+      alert('Review feature coming soon! ⭐');
+    };
+
+    // ── Tab switch ───────────────────────────────────────────────
+    window.switchTab = function(tab) {
+      activeTab = tab;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(`tab-${tab}`).classList.add('active');
+      renderOrders(allOrders);
+    };
+
+    // ── Summary ──────────────────────────────────────────────────
+    function updateSummary() {
+      const total    = allOrders.length;
+      const active   = allOrders.filter(o => ['pending','confirmed'].includes(o.orderStatus)).length;
+      document.getElementById('orderSummaryText').textContent =
+        total === 0
+          ? 'No orders yet'
+          : `${total} order${total!==1?'s':''} · ${active} active`;
+    }
+
+    function catEmoji(cat) {
+      const m = { Clothing:'👕', Shoes:'👟', Accessories:'👜', Bags:'🎒', Vintage:'🕶️', Wholesale:'📦', Kids:'🧒' };
+      return m[cat] || '🛍️';
+    }
+  </script>
+
+</body>
+</html>

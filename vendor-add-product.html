@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mukoto Avenue — Add Product</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232E7D32' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' dominant-baseline='middle'>🛍️</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { min-height: 100vh; background: #FAFAFA; font-family: 'Inter', sans-serif; padding-bottom: 100px; }
+
+    .header {
+      background: white; padding: 52px 20px 16px;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .back-btn {
+      width: 40px; height: 40px; background: #F3F4F6; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; cursor: pointer; border: none; text-decoration: none;
+    }
+    .back-btn:hover { background: #E5E7EB; }
+    .header-title { font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 800; color: #1A1A1A; }
+    .header-title span { font-size: 13px; font-weight: 500; color: #9CA3AF; display: block; }
+    .draft-btn {
+      font-size: 13px; font-weight: 600; color: #6B7280;
+      background: #F3F4F6; border: none; border-radius: 10px;
+      padding: 8px 14px; cursor: pointer;
+    }
+
+    .body { padding: 20px 16px 0; }
+
+    .card { background: white; border-radius: 16px; padding: 18px; margin-bottom: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+    .card-title { font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 800; color: #1A1A1A; margin-bottom: 16px; }
+
+    /* Storage notice */
+    .storage-notice {
+      background: #fffde7; border: 1px solid #F9A825; border-radius: 12px;
+      padding: 12px 14px; margin-bottom: 14px;
+      font-size: 12px; color: #795548; line-height: 1.5;
+      display: none;
+    }
+    .storage-notice.show { display: block; }
+    .storage-notice strong { color: #E65100; }
+
+    /* Images */
+    .images-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .img-slot {
+      aspect-ratio: 1; border-radius: 14px; border: 2px dashed #E5E7EB;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; background: #F9FAFB;
+    }
+    .img-slot:hover { border-color: #2E7D32; background: #f0faf0; }
+    .img-slot.filled { border-style: solid; border-color: transparent; }
+    .img-slot img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+    .img-slot-icon { font-size: 24px; margin-bottom: 4px; }
+    .img-slot-label { font-size: 10px; font-weight: 600; color: #9CA3AF; text-align: center; line-height: 1.3; }
+    .img-slot.main-slot .img-slot-label { color: #2E7D32; }
+    .img-remove {
+      position: absolute; top: 6px; right: 6px; width: 22px; height: 22px;
+      border-radius: 50%; background: rgba(0,0,0,0.6); color: white;
+      border: none; cursor: pointer; font-size: 11px;
+      display: flex; align-items: center; justify-content: center; z-index: 5;
+    }
+    .file-input { display: none; }
+
+    /* Fields */
+    .field { margin-bottom: 16px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .field-label { display: block; font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 7px; }
+    .field-required { color: #EF5350; }
+    .field-wrap { position: relative; }
+    .field-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); font-size: 15px; pointer-events: none; z-index: 1; }
+    .field-icon-top { position: absolute; left: 13px; top: 14px; font-size: 15px; pointer-events: none; z-index: 1; }
+    .field-input {
+      width: 100%; padding: 13px 14px 13px 42px;
+      border: 1.5px solid #E5E7EB; border-radius: 12px;
+      font-size: 14px; color: #1A1A1A; background: white;
+      font-family: 'Inter', sans-serif; transition: all 0.2s; outline: none;
+    }
+    .field-input:focus { border-color: #2E7D32; box-shadow: 0 0 0 3px rgba(46,125,50,0.1); }
+    .field-input.error { border-color: #EF5350; }
+    .field-input::placeholder { color: #9CA3AF; }
+    .field-textarea {
+      width: 100%; padding: 13px 14px 13px 42px;
+      border: 1.5px solid #E5E7EB; border-radius: 12px;
+      font-size: 14px; color: #1A1A1A; background: white;
+      font-family: 'Inter', sans-serif; transition: all 0.2s; outline: none;
+      resize: none; min-height: 100px; line-height: 1.6;
+    }
+    .field-textarea:focus { border-color: #2E7D32; box-shadow: 0 0 0 3px rgba(46,125,50,0.1); }
+    .char-count { text-align: right; font-size: 11px; color: #9CA3AF; margin-top: 4px; }
+    .field-error { font-size: 11px; color: #EF5350; margin-top: 5px; display: none; }
+    .field-error.show { display: block; }
+
+    /* Category */
+    .category-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .cat-option {
+      border: 2px solid #E5E7EB; border-radius: 12px; padding: 10px 6px;
+      text-align: center; cursor: pointer; transition: all 0.2s; background: white;
+    }
+    .cat-option.selected { border-color: #2E7D32; background: #f0faf0; box-shadow: 0 2px 10px rgba(46,125,50,0.15); }
+    .cat-option-icon { font-size: 20px; margin-bottom: 4px; }
+    .cat-option-label { font-size: 9px; font-weight: 700; color: #374151; }
+
+    /* Condition */
+    .condition-toggle { display: flex; gap: 10px; }
+    .cond-btn {
+      flex: 1; padding: 12px; border-radius: 12px;
+      border: 2px solid #E5E7EB; background: white;
+      cursor: pointer; transition: all 0.2s; text-align: center;
+    }
+    .cond-btn.selected { border-color: #2E7D32; background: #f0faf0; }
+    .cond-btn-icon { font-size: 20px; margin-bottom: 4px; }
+    .cond-btn-label { font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 700; color: #374151; display: block; }
+    .cond-btn-desc { font-size: 10px; color: #9CA3AF; }
+
+    /* Pricing */
+    .price-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .currency-badge {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      font-size: 11px; font-weight: 700; color: #6B7280; pointer-events: none;
+      background: #F3F4F6; padding: 2px 6px; border-radius: 6px;
+    }
+    .price-input {
+      width: 100%; padding: 13px 14px 13px 56px;
+      border: 1.5px solid #E5E7EB; border-radius: 12px;
+      font-size: 14px; color: #1A1A1A; background: white;
+      font-family: 'Inter', sans-serif; transition: all 0.2s; outline: none;
+    }
+    .price-input:focus { border-color: #2E7D32; box-shadow: 0 0 0 3px rgba(46,125,50,0.1); }
+    .zwg-hint { font-size: 11px; color: #9CA3AF; margin-top: 5px; text-align: right; }
+
+    /* Tags */
+    .tags-wrap {
+      border: 1.5px solid #E5E7EB; border-radius: 12px; padding: 8px 10px;
+      background: white; display: flex; flex-wrap: wrap; gap: 6px;
+      min-height: 48px; cursor: text; transition: border-color 0.2s;
+    }
+    .tags-wrap:focus-within { border-color: #2E7D32; box-shadow: 0 0 0 3px rgba(46,125,50,0.1); }
+    .tag-chip {
+      display: flex; align-items: center; gap: 4px;
+      background: #e8f5e9; border-radius: 999px; padding: 4px 10px;
+      font-size: 12px; font-weight: 600; color: #2E7D32;
+    }
+    .tag-remove { background: none; border: none; cursor: pointer; color: #2E7D32; font-size: 13px; padding: 0; }
+    .tag-input {
+      border: none; outline: none; font-size: 13px;
+      font-family: 'Inter', sans-serif; color: #1A1A1A;
+      flex: 1; min-width: 80px; background: transparent;
+    }
+
+    /* CTA bar */
+    .cta-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: white; padding: 14px 16px 32px;
+      border-top: 1px solid #F3F4F6; z-index: 200;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.08); display: flex; gap: 10px;
+    }
+    .btn-preview {
+      flex: 1; padding: 15px; border-radius: 14px;
+      border: 1.5px solid #E5E7EB; background: white;
+      font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 700;
+      color: #374151; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-publish {
+      flex: 2; padding: 15px; border-radius: 14px; border: none;
+      background: linear-gradient(135deg, #2E7D32, #1B5E20); color: white;
+      font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+      box-shadow: 0 4px 16px rgba(46,125,50,0.35);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-publish:hover:not(:disabled) { transform: translateY(-2px); }
+    .btn-publish:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .spinner {
+      width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white; border-radius: 50%;
+      animation: spin 0.7s linear infinite; display: none;
+    }
+    .btn-publish.loading .spinner { display: block; }
+    .btn-publish.loading .publish-text { display: none; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 110px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      padding: 12px 20px; border-radius: 12px;
+      font-size: 13px; font-weight: 600; color: white;
+      opacity: 0; transition: all 0.3s; z-index: 1000;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2); max-width: 90vw; text-align: center;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { background: #2E7D32; }
+    .toast.error { background: #EF5350; }
+    .toast.info { background: #1565C0; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-left">
+      <a href="vendor-listings.html" class="back-btn">←</a>
+      <div class="header-title">
+        Add Product
+        <span id="editLabel" style="display:none;">Editing existing listing</span>
+      </div>
+    </div>
+    <button class="draft-btn" onclick="saveDraft()">Save Draft</button>
+  </div>
+
+  <div class="body">
+
+    <!-- Storage notice -->
+    <div class="storage-notice" id="storageNotice">
+      <strong>📷 Photo uploads disabled</strong> — Firebase Storage is not yet enabled on your project.
+      Your listing will be saved <strong>without photos</strong>. To enable photos: Firebase Console → Storage → Get Started.
+      You can add photos later by editing this listing.
+    </div>
+
+    <!-- Images -->
+    <div class="card">
+      <div class="card-title">📸 Product Photos <span style="font-size:11px;font-weight:500;color:#9CA3AF;">(optional — add photos after enabling Storage)</span></div>
+      <div class="images-grid" id="imagesGrid">
+        <div class="img-slot main-slot" onclick="triggerUpload(0)">
+          <div class="img-slot-icon">📷</div>
+          <div class="img-slot-label">Main Photo</div>
+        </div>
+        <div class="img-slot" onclick="triggerUpload(1)">
+          <div class="img-slot-icon">➕</div>
+          <div class="img-slot-label">Add Photo</div>
+        </div>
+        <div class="img-slot" onclick="triggerUpload(2)">
+          <div class="img-slot-icon">➕</div>
+          <div class="img-slot-label">Add Photo</div>
+        </div>
+        <div class="img-slot" onclick="triggerUpload(3)">
+          <div class="img-slot-icon">➕</div>
+          <div class="img-slot-label">Add Photo</div>
+        </div>
+        <div class="img-slot" onclick="triggerUpload(4)">
+          <div class="img-slot-icon">➕</div>
+          <div class="img-slot-label">Add Photo</div>
+        </div>
+      </div>
+      <input type="file" accept="image/*" class="file-input" id="fileInput" onchange="handleFileSelect(event)"/>
+      <div style="font-size:11px;color:#9CA3AF;margin-top:10px;text-align:center;">Up to 5 photos · JPG, PNG · Max 5MB each</div>
+    </div>
+
+    <!-- Basic info -->
+    <div class="card">
+      <div class="card-title">📝 Basic Information</div>
+      <div class="field">
+        <label class="field-label">Product Title <span class="field-required">*</span></label>
+        <div class="field-wrap">
+          <span class="field-icon">🏷️</span>
+          <input class="field-input" id="titleInput" type="text" placeholder="e.g. Vintage Levi's Denim Jacket" maxlength="80" oninput="updateCount('titleCount', this.value, 80)"/>
+        </div>
+        <div class="char-count"><span id="titleCount">0</span>/80</div>
+        <div class="field-error" id="titleErr">Product title is required</div>
+      </div>
+      <div class="field">
+        <label class="field-label">Description <span class="field-required">*</span></label>
+        <div class="field-wrap">
+          <span class="field-icon-top">📄</span>
+          <textarea class="field-textarea" id="descInput" placeholder="Describe your product — size, colour, brand, any defects..." maxlength="500" oninput="updateCount('descCount', this.value, 500)"></textarea>
+        </div>
+        <div class="char-count"><span id="descCount">0</span>/500</div>
+        <div class="field-error" id="descErr">Description is required</div>
+      </div>
+    </div>
+
+    <!-- Category -->
+    <div class="card">
+      <div class="card-title">🏷️ Category <span class="field-required" style="font-size:12px;">*</span></div>
+      <div class="category-grid">
+        <div class="cat-option selected" data-cat="Clothing" onclick="selectCat(this)"><div class="cat-option-icon">👕</div><div class="cat-option-label">Clothing</div></div>
+        <div class="cat-option" data-cat="Shoes" onclick="selectCat(this)"><div class="cat-option-icon">👟</div><div class="cat-option-label">Shoes</div></div>
+        <div class="cat-option" data-cat="Accessories" onclick="selectCat(this)"><div class="cat-option-icon">👜</div><div class="cat-option-label">Accessories</div></div>
+        <div class="cat-option" data-cat="Bags" onclick="selectCat(this)"><div class="cat-option-icon">🎒</div><div class="cat-option-label">Bags</div></div>
+        <div class="cat-option" data-cat="Vintage" onclick="selectCat(this)"><div class="cat-option-icon">🕶️</div><div class="cat-option-label">Vintage</div></div>
+        <div class="cat-option" data-cat="Wholesale" onclick="selectCat(this)"><div class="cat-option-icon">📦</div><div class="cat-option-label">Wholesale</div></div>
+        <div class="cat-option" data-cat="Kids" onclick="selectCat(this)"><div class="cat-option-icon">🧒</div><div class="cat-option-label">Kids</div></div>
+        <div class="cat-option" data-cat="Other" onclick="selectCat(this)"><div class="cat-option-icon">🛍️</div><div class="cat-option-label">Other</div></div>
+      </div>
+    </div>
+
+    <!-- Condition -->
+    <div class="card">
+      <div class="card-title">✨ Condition <span class="field-required" style="font-size:12px;">*</span></div>
+      <div class="condition-toggle">
+        <div class="cond-btn selected" id="condNew" onclick="selectCond('New')">
+          <div class="cond-btn-icon">🆕</div>
+          <div class="cond-btn-label">New</div>
+          <div class="cond-btn-desc">Never worn or used</div>
+        </div>
+        <div class="cond-btn" id="condUsed" onclick="selectCond('Used')">
+          <div class="cond-btn-icon">♻️</div>
+          <div class="cond-btn-label">Used</div>
+          <div class="cond-btn-desc">Pre-owned, good condition</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pricing -->
+    <div class="card">
+      <div class="card-title">💰 Pricing</div>
+      <div class="price-row">
+        <div>
+          <label class="field-label">Price (USD) <span class="field-required">*</span></label>
+          <div class="field-wrap">
+            <span class="currency-badge">USD</span>
+            <input class="price-input" id="priceUsd" type="number" placeholder="0.00" min="0" step="0.01" oninput="calcZwg(this.value)"/>
+          </div>
+          <div class="field-error" id="priceErr">Enter a valid price</div>
+        </div>
+        <div>
+          <label class="field-label">Price (ZWG)</label>
+          <div class="field-wrap">
+            <span class="currency-badge">ZWG</span>
+            <input class="price-input" id="priceZwg" type="number" placeholder="Auto" min="0" step="1"/>
+          </div>
+          <div class="zwg-hint" id="zwgHint">Auto-calculated at ×36</div>
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:0; margin-top:12px;">
+        <label class="field-label">Stock Quantity <span class="field-required">*</span></label>
+        <div class="field-wrap">
+          <span class="field-icon">📦</span>
+          <input class="field-input" id="stockInput" type="number" placeholder="How many do you have?" min="1" step="1"/>
+        </div>
+        <div class="field-error" id="stockErr">Enter stock quantity</div>
+      </div>
+    </div>
+
+    <!-- Tags -->
+    <div class="card">
+      <div class="card-title">🔖 Tags</div>
+      <div class="tags-wrap" id="tagsWrap" onclick="focusTagInput()">
+        <input class="tag-input" id="tagInput" type="text" placeholder="Type a tag and press Enter..." onkeydown="handleTagKey(event)"/>
+      </div>
+      <div style="font-size:11px;color:#9CA3AF;margin-top:6px;">e.g. denim, vintage, size-12, harare</div>
+    </div>
+
+  </div>
+
+  <!-- CTA bar -->
+  <div class="cta-bar">
+    <button class="btn-preview" onclick="saveDraft()">Save Draft</button>
+    <button class="btn-publish" id="publishBtn" onclick="publishProduct()">
+      <div class="spinner"></div>
+      <span class="publish-text">🚀 Publish Listing</span>
+    </button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { initializeApp }       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2vGB7iehqse--Th5wds1MoU4ZHr_DYY4",
+      authDomain: "mukoto-avenue-3758a.firebaseapp.com",
+      projectId: "mukoto-avenue-3758a",
+      storageBucket: "mukoto-avenue-3758a.firebasestorage.app",
+      messagingSenderId: "172793539743",
+      appId: "1:172793539743:web:46fae0bd5be1ecedebc6aa",
+      measurementId: "G-VN9T6FEVJ0"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    let currentUser  = null;
+    let vendorData   = null;
+    let selectedCat  = 'Clothing';
+    let selectedCond = 'New';
+    let tags         = [];
+    let imageFiles   = [null, null, null, null, null];
+    let imageUrls    = [null, null, null, null, null]; // local preview URLs
+    let activeSlot   = 0;
+    let editProductId = null;
+    let storageAvailable = false;
+
+    // ── Check if Storage is available ────────────────────────────
+    async function checkStorage() {
+      try {
+        // Dynamically try to import Storage — if it fails or throws, Storage not enabled
+        const { getStorage, ref, uploadBytes } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js");
+        // Try a test by just initialising — actual availability only known on upload attempt
+        storageAvailable = true;
+      } catch (e) {
+        storageAvailable = false;
+        document.getElementById('storageNotice').classList.add('show');
+      }
+    }
+
+    // ── Auth guard ────────────────────────────────────────────────
+    onAuthStateChanged(auth, async user => {
+      if (!user) { window.location.href = 'login.html'; return; }
+      currentUser = user;
+
+      const snap = await getDoc(doc(db, 'users', user.uid));
+      if (!snap.exists() || snap.data().role !== 'vendor') {
+        window.location.href = 'customer-home.html'; return;
+      }
+
+      const vSnap = await getDoc(doc(db, 'vendors', user.uid));
+      if (vSnap.exists()) vendorData = vSnap.data();
+
+      await checkStorage();
+
+      // Check if editing
+      const params = new URLSearchParams(window.location.search);
+      editProductId = params.get('edit');
+      if (editProductId) loadEditProduct(editProductId);
+
+      // Load draft if no edit mode
+      if (!editProductId) loadDraftIfExists();
+    });
+
+    // ── Load product for editing ──────────────────────────────────
+    async function loadEditProduct(productId) {
+      try {
+        const snap = await getDoc(doc(db, 'products', productId));
+        if (!snap.exists()) return;
+        const p = snap.data();
+        document.getElementById('editLabel').style.display = 'block';
+        document.getElementById('titleInput').value = p.title || '';
+        document.getElementById('descInput').value  = p.description || '';
+        document.getElementById('priceUsd').value   = p.price || '';
+        document.getElementById('priceZwg').value   = p.priceZWG || '';
+        document.getElementById('stockInput').value = p.stock || '';
+        updateCount('titleCount', p.title || '', 80);
+        updateCount('descCount',  p.description || '', 500);
+        document.querySelectorAll('.cat-option').forEach(el => el.classList.toggle('selected', el.dataset.cat === p.category));
+        selectedCat = p.category || 'Clothing';
+        selectCond(p.condition || 'New');
+        (p.tags || []).forEach(t => addTag(t));
+        // Show existing images
+        (p.images || []).forEach((url, i) => {
+          if (url) setSlotPreview(i, url);
+        });
+        document.querySelector('.publish-text').textContent = '💾 Save Changes';
+      } catch (err) {
+        console.error('Edit load error:', err);
+      }
+    }
+
+    // ── Image upload ──────────────────────────────────────────────
+    window.triggerUpload = function(slot) {
+      activeSlot = slot;
+      document.getElementById('fileInput').click();
+    };
+
+    window.handleFileSelect = function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) { showToast('Image must be under 5MB', 'error'); return; }
+      imageFiles[activeSlot] = file;
+      const url = URL.createObjectURL(file);
+      setSlotPreview(activeSlot, url);
+      e.target.value = '';
+    };
+
+    function setSlotPreview(slot, url) {
+      imageUrls[slot] = url;
+      const slots = document.querySelectorAll('.img-slot');
+      const el    = slots[slot];
+      el.classList.add('filled');
+      el.innerHTML = `
+        <img src="${url}" alt="Product photo"/>
+        <button class="img-remove" onclick="removeImage(event, ${slot})">✕</button>`;
+    }
+
+    window.removeImage = function(e, slot) {
+      e.stopPropagation();
+      imageFiles[slot] = null;
+      imageUrls[slot]  = null;
+      const slots = document.querySelectorAll('.img-slot');
+      const el    = slots[slot];
+      el.classList.remove('filled');
+      el.innerHTML = slot === 0
+        ? `<div class="img-slot-icon">📷</div><div class="img-slot-label">Main Photo</div>`
+        : `<div class="img-slot-icon">➕</div><div class="img-slot-label">Add Photo</div>`;
+      el.onclick = () => triggerUpload(slot);
+    };
+
+    // ── Upload images to Storage or server (fallback) ──────────────
+    async function uploadImages() {
+      const uploadedUrls = [];
+      // Keep existing HTTP urls (from edit mode)
+      const existingUrls = imageUrls.filter(u => u && u.startsWith('http'));
+      if (existingUrls.length > 0) uploadedUrls.push(...existingUrls);
+
+      // First, try Firebase Storage if available
+      if (storageAvailable) {
+        try {
+          const { getStorage, ref, uploadBytes, getDownloadURL } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js");
+          const storage = getStorage(app);
+
+          for (let i = 0; i < 5; i++) {
+            if (imageFiles[i]) {
+              const storageRef = ref(storage, `products/${currentUser.uid}/${Date.now()}_${i}`);
+              await uploadBytes(storageRef, imageFiles[i]);
+              const url = await getDownloadURL(storageRef);
+              uploadedUrls.push(url);
+            }
+          }
+        } catch (err) {
+          console.error('Storage upload error:', err);
+          storageAvailable = false;
+          document.getElementById('storageNotice').classList.add('show');
+          showToast('Photos skipped on Firebase — falling back to server upload.', 'info');
+        }
+      }
+
+      // If Firebase Storage not available or failed, try server-side upload
+      const hasLocalFiles = imageFiles.some(f => f);
+      if (!storageAvailable && hasLocalFiles) {
+        try {
+          const fd = new FormData();
+          for (let i = 0; i < 5; i++) if (imageFiles[i]) fd.append('images', imageFiles[i]);
+          const resp = await fetch('/api/upload', { method: 'POST', body: fd });
+          if (resp.ok) {
+            const data = await resp.json();
+            if (data.urls && data.urls.length) uploadedUrls.push(...data.urls);
+          } else {
+            console.error('Server upload failed', resp.status, await resp.text());
+            showToast('Server upload failed — images were not saved.', 'error');
+          }
+        } catch (err) {
+          console.error('Server upload error:', err);
+          showToast('Server upload error — images were not saved.', 'error');
+        }
+      }
+
+      return uploadedUrls;
+    }
+
+    // ── Publish product ───────────────────────────────────────────
+    window.publishProduct = async function() {
+      if (!validate()) return;
+
+      const btn = document.getElementById('publishBtn');
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      try {
+        // Try image upload (gracefully skips if Storage unavailable)
+        showToast('Saving listing...', 'info');
+        const images = await uploadImages();
+
+        const productData = {
+          vendorId:    currentUser.uid,
+          vendorName:  vendorData?.shopName || 'Vendor',
+          title:       document.getElementById('titleInput').value.trim(),
+          description: document.getElementById('descInput').value.trim(),
+          category:    selectedCat,
+          condition:   selectedCond,
+          price:       Number(document.getElementById('priceUsd').value),
+          priceZWG:    Number(document.getElementById('priceZwg').value) || Number(document.getElementById('priceUsd').value) * 36,
+          stock:       Number(document.getElementById('stockInput').value),
+          images,
+          tags,
+          isAvailable: true,
+          updatedAt:   serverTimestamp()
+        };
+
+        if (editProductId) {
+          await updateDoc(doc(db, 'products', editProductId), productData);
+          showToast('Listing updated! ✅', 'success');
+        } else {
+          productData.createdAt = serverTimestamp();
+          await addDoc(collection(db, 'products'), productData);
+          // Clear draft
+          localStorage.removeItem('ma_product_draft');
+          showToast('Listing published! 🚀', 'success');
+        }
+
+        setTimeout(() => window.location.href = 'vendor-listings.html', 1500);
+
+      } catch (err) {
+        console.error('Publish error:', err);
+        btn.classList.remove('loading');
+        btn.disabled = false;
+        showToast('Could not save. Check your internet connection.', 'error');
+      }
+    };
+
+    // ── Validation ────────────────────────────────────────────────
+    function validate() {
+      let valid = true;
+      const checks = [
+        { id: 'titleInput', errId: 'titleErr', check: v => v.trim().length > 0, msg: 'Product title is required' },
+        { id: 'descInput',  errId: 'descErr',  check: v => v.trim().length > 0, msg: 'Description is required' },
+        { id: 'priceUsd',   errId: 'priceErr', check: v => v && Number(v) > 0,  msg: 'Enter a valid price' },
+        { id: 'stockInput', errId: 'stockErr', check: v => v && Number(v) >= 1, msg: 'Enter stock quantity' },
+      ];
+      checks.forEach(c => {
+        const input = document.getElementById(c.id);
+        const err   = document.getElementById(c.errId);
+        const ok    = c.check(input.value);
+        input.classList.toggle('error', !ok);
+        err.textContent = c.msg;
+        err.classList.toggle('show', !ok);
+        if (!ok) valid = false;
+      });
+      return valid;
+    }
+
+    // ── Save draft ────────────────────────────────────────────────
+    window.saveDraft = function() {
+      localStorage.setItem('ma_product_draft', JSON.stringify({
+        title: document.getElementById('titleInput').value,
+        desc:  document.getElementById('descInput').value,
+        price: document.getElementById('priceUsd').value,
+        stock: document.getElementById('stockInput').value,
+        category: selectedCat, condition: selectedCond, tags
+      }));
+      showToast('Draft saved 📝', 'success');
+    };
+
+    function loadDraftIfExists() {
+      const draft = JSON.parse(localStorage.getItem('ma_product_draft') || 'null');
+      if (!draft) return;
+      if (!confirm('You have a saved draft. Load it?')) return;
+      document.getElementById('titleInput').value = draft.title || '';
+      document.getElementById('descInput').value  = draft.desc  || '';
+      document.getElementById('priceUsd').value   = draft.price || '';
+      document.getElementById('stockInput').value = draft.stock || '';
+      if (draft.category) { document.querySelectorAll('.cat-option').forEach(el => el.classList.toggle('selected', el.dataset.cat === draft.category)); selectedCat = draft.category; }
+      if (draft.condition) selectCond(draft.condition);
+      (draft.tags || []).forEach(t => addTag(t));
+      updateCount('titleCount', draft.title || '', 80);
+      updateCount('descCount',  draft.desc  || '', 500);
+    }
+
+    // ── UI helpers ────────────────────────────────────────────────
+    window.selectCat  = el => { document.querySelectorAll('.cat-option').forEach(c => c.classList.remove('selected')); el.classList.add('selected'); selectedCat = el.dataset.cat; };
+    window.selectCond = c  => { selectedCond = c; document.getElementById('condNew').classList.toggle('selected', c==='New'); document.getElementById('condUsed').classList.toggle('selected', c==='Used'); };
+    window.calcZwg    = v  => { const z = (Number(v)*36).toFixed(0); document.getElementById('priceZwg').value = v ? z : ''; document.getElementById('zwgHint').textContent = v ? `= ZWG ${z} (×36 rate)` : 'Auto-calculated at ×36'; };
+    window.updateCount = (id, val, max) => { document.getElementById(id).textContent = val.length; };
+    window.focusTagInput = () => document.getElementById('tagInput').focus();
+
+    window.handleTagKey = function(e) {
+      if (e.key === 'Enter' || e.key === ',') {
+        e.preventDefault();
+        const val = e.target.value.trim().toLowerCase().replace(/,/g,'');
+        if (val && !tags.includes(val) && tags.length < 10) addTag(val);
+        e.target.value = '';
+      }
+      if (e.key === 'Backspace' && !e.target.value && tags.length) removeTag(tags[tags.length-1]);
+    };
+
+    function addTag(val) { tags.push(val); renderTags(); }
+    window.removeTag = function(val) { tags = tags.filter(t => t !== val); renderTags(); };
+    function renderTags() {
+      const wrap = document.getElementById('tagsWrap');
+      const input = document.getElementById('tagInput');
+      wrap.innerHTML = '';
+      tags.forEach(t => { const chip = document.createElement('div'); chip.className = 'tag-chip'; chip.innerHTML = `#${t} <button class="tag-remove" onclick="removeTag('${t}')">✕</button>`; wrap.appendChild(chip); });
+      wrap.appendChild(input);
+    }
+
+    window.showToast = function(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.className = `toast ${type} show`;
+      setTimeout(() => t.classList.remove('show'), 3000);
+    };
+
+    // Clear errors on input
+    document.querySelectorAll('.field-input, .field-textarea, .price-input').forEach(input => {
+      input.addEventListener('input', () => { input.classList.remove('error'); const err = document.getElementById(input.id + 'Err'); if (err) err.classList.remove('show'); });
+    });
+  </script>
+
+</body>
+</html>

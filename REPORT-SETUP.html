@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Report Modal Setup</title>  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232E7D32' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' dominant-baseline='middle'>🛍️</text></svg>" />  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      background: #1e1e1e;
+      color: #e0e0e0;
+      padding: 40px;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #2d2d2d;
+      padding: 30px;
+      border-radius: 8px;
+      border: 1px solid #404040;
+    }
+    h1, h2 {
+      color: #4ade80;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+    .code-block {
+      background: #1e1e1e;
+      padding: 15px;
+      border-radius: 6px;
+      border-left: 3px solid #4ade80;
+      margin: 15px 0;
+      overflow-x: auto;
+    }
+    .section {
+      margin: 30px 0;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #404040;
+    }
+    .highlight {
+      color: #4ade80;
+    }
+    .note {
+      background: #264653;
+      border-left: 4px solid #2a9d8f;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 15px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📋 Report Modal Setup Guide</h1>
+    
+    <div class="section">
+      <h2>Step 1: Add Report Modal HTML</h2>
+      <p>Add this HTML code to your pages (e.g., customer-home.html, customer-vendor-profile.html, etc):</p>
+      <div class="code-block">
+&lt;!-- Report Modal --&gt;
+&lt;div id="reportModal" class="modal" style="display:none;"&gt;
+  &lt;div class="modal-content"&gt;
+    &lt;div class="modal-header"&gt;
+      &lt;h2&gt;📋 Report &lt;span id="reportTarget"&gt;&lt;/span&gt;&lt;/h2&gt;
+      &lt;button class="modal-close" onclick="closeReportModal()"&gt;×&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class="modal-body"&gt;
+      &lt;div class="form-group"&gt;
+        &lt;label for="reportReason"&gt;Reason for Report&lt;/label&gt;
+        &lt;select id="reportReason"&gt;
+          &lt;option value=""&gt;-- Select Reason --&lt;/option&gt;
+          &lt;option value="Inappropriate Content"&gt;Inappropriate Content&lt;/option&gt;
+          &lt;option value="Scam/Fraud"&gt;Scam/Fraud&lt;/option&gt;
+          &lt;option value="Poor Quality"&gt;Poor Quality&lt;/option&gt;
+          &lt;option value="False Information"&gt;False Information&lt;/option&gt;
+          &lt;option value="Offensive Language"&gt;Offensive Language&lt;/option&gt;
+          &lt;option value="Other"&gt;Other&lt;/option&gt;
+        &lt;/select&gt;
+      &lt;/div&gt;
+      &lt;div class="form-group"&gt;
+        &lt;label for="reportDetails"&gt;Additional Details&lt;/label&gt;
+        &lt;textarea id="reportDetails" placeholder="Please provide more information..." rows="4"&gt;&lt;/textarea&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="modal-footer"&gt;
+      &lt;button class="btn btn-secondary" onclick="closeReportModal()"&gt;Cancel&lt;/button&gt;
+      &lt;button class="btn btn-danger" onclick="submitReport()"&gt;Submit Report&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Step 2: Add Modal CSS</h2>
+      <p>Add this CSS code to your &lt;style&gt; section:</p>
+      <div class="code-block">
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h2 {
+  font-size: 18px;
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #9ca3af;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 10px;
+  padding: 20px;
+  border-top: 1px solid #e5e7eb;
+  justify-content: flex-end;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #374151;
+  font-size: 14px;
+}
+
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+}
+
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #1a1a2e;
+  box-shadow: 0 0 0 3px rgba(26,26,46,0.1);
+}
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Step 3: Add Report Buttons</h2>
+      <p>Add report buttons wherever needed. Examples:</p>
+      
+      <h3>For Vendors (on customer-vendor-profile.html):</h3>
+      <div class="code-block">
+&lt;button onclick="openReportModal('vendor', vendorId, vendorName)"&gt;🚩 Report Vendor&lt;/button&gt;
+      </div>
+
+      <h3>For Vendors (on vendor cards):</h3>
+      <div class="code-block">
+&lt;button onclick="openReportModal('vendor', vendorId, vendorName)" style="margin-top: 10px;"&gt;Report&lt;/button&gt;
+      </div>
+
+      <h3>For Customers (user profile or chat):</h3>
+      <div class="code-block">
+&lt;button onclick="openReportModal('customer', customerId, customerEmail)"&gt;🚩 Report User&lt;/button&gt;
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Step 4: Add JavaScript Functions</h2>
+      <p>Add these functions to your page's &lt;script&gt; section:</p>
+      <div class="code-block">
+let currentReport = { type: null, id: null, name: null };
+
+function openReportModal(type, id, name) {
+  currentReport = { type, id, name };
+  document.getElementById('reportTarget').textContent = 
+    type === 'vendor' ? `Vendor: ${name}` : `User: ${name}`;
+  document.getElementById('reportModal').style.display = 'flex';
+  document.getElementById('reportReason').value = '';
+  document.getElementById('reportDetails').value = '';
+}
+
+function closeReportModal() {
+  document.getElementById('reportModal').style.display = 'none';
+}
+
+async function submitReport() {
+  const reason = document.getElementById('reportReason').value;
+  const details = document.getElementById('reportDetails').value;
+
+  if (!reason) {
+    alert('Please select a reason');
+    return;
+  }
+
+  try {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+      alert('Please login to submit a report');
+      return;
+    }
+
+    await firebase.firestore().collection('reports').add({
+      reportType: currentReport.type,
+      vendorId: currentReport.type === 'vendor' ? currentReport.id : null,
+      vendorName: currentReport.type === 'vendor' ? currentReport.name : null,
+      customerId: currentReport.type === 'customer' ? currentReport.id : null,
+      customerEmail: currentReport.type === 'customer' ? currentReport.name : null,
+      reason: reason,
+      details: details,
+      reporterEmail: user.email,
+      reporterUid: user.uid,
+      createdAt: new Date(),
+      status: 'pending'
+    });
+
+    alert('✅ Report submitted successfully. Admin will review soon.');
+    closeReportModal();
+  } catch (err) {
+    console.error('Report error:', err);
+    alert('❌ Error submitting report: ' + err.message);
+  }
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(e) {
+  const modal = document.getElementById('reportModal');
+  if (e.target === modal) {
+    closeReportModal();
+  }
+});
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>💡 Quick Insert Guide:</strong>
+      <p>To quickly add report functionality to a page:</p>
+      <ol style="margin: 10px 0;">
+        <li>Scroll to the bottom of your HTML file's &lt;body&gt;</li>
+        <li>Paste the HTML from Step 1 before &lt;/body&gt;</li>
+        <li>Add the CSS from Step 2 to your &lt;style&gt; section</li>
+        <li>Add the JS from Step 4 to your &lt;script&gt; section</li>
+        <li>Add report buttons using examples from Step 3</li>
+      </ol>
+    </div>
+
+    <div class="note">
+      <strong>🔗 Important:</strong>
+      <p>Make sure your page has the Firebase SDK loaded (already has it in your existing pages)</p>
+    </div>
+
+    <div class="section" style="border: none;">
+      <h2>Admin Access</h2>
+      <p>After reports are submitted, admin can access them at:</p>
+      <p style="margin: 10px 0; padding: 10px; background: #1e1e1e; border-radius: 4px;">
+        <span class="highlight">/admin-login.html</span> → <span class="highlight">/admin-dashboard.html</span>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vendor Earnings | Muk</title>
+  <style>
+    body { margin:0; font-family:Inter,system-ui,sans-serif; background:#F5F5F7; color:#1f2937; }
+    .header{padding:20px 16px 16px; background:#FFFFFF; box-shadow:0 1px 2px rgba(0,0,0,.08);}
+    .header-row{display:flex;align-items:center;justify-content:space-between;}
+    .header-left{display:flex;align-items:center;gap:10px;}
+    .vendor-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#e2f3e7;color:#2e7d32;font-weight:900;text-decoration:none;}
+    .header-text{line-height:1.1;}
+    .greeting{font-size:12px;color:#6b7280;}
+    .vendor-name-text{font-size:18px;font-weight:700;}
+    .icon-btn{font-size:20px;text-decoration:none;color:#374151;}
+    .body{padding:12px 16px 84px;}
+    .section-title{margin-bottom:10px;font-size:14px;font-weight:700;color:#374151;}
+    .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 10px 15px rgba(0,0,0,.06);margin-bottom:12px;}
+    .card-row{display:flex;justify-content:space-between;align-items:center;margin-top:12px;}
+    .card-label{color:#6b7280;font-size:13px;}
+    .card-value{font-size:24px;font-weight:800;color:#0f766e;}
+    .bottom-nav{position:fixed;bottom:0;left:0;width:100%;display:flex;background:#fff;border-top:1px solid #e5e7eb;box-shadow:0 -1px 6px rgba(0,0,0,.08);}
+    .nav-item{flex:1;padding:8px 0;text-align:center;text-decoration:none;color:#9ca3af;font-size:12px;font-weight:600;}
+    .nav-item.active{color:#2e7d32;}
+    .nav-icon{font-size:20px;display:block;}
+    .nav-dot{margin-top:4px;width:6px;height:6px;border-radius:999px;background:#2e7d32;margin-left:auto;margin-right:auto;display:none;}
+    .nav-item.active .nav-dot{display:block;}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-row">
+      <div class="header-left">
+        <a href="vendor-profile.html" class="vendor-avatar">?</a>
+        <div class="header-text">
+          <div class="greeting">Vendor Account</div>
+          <div class="vendor-name-text">Your Earnings</div>
+        </div>
+      </div>
+      <div>
+        <a href="shared-notifications.html" class="icon-btn">🔔</a>
+        <a href="shared-chat-list.html" class="icon-btn" style="margin-left:12px;">💬</a>
+      </div>
+    </div>
+  </div>
+  <div class="body">
+    <div class="section-title">Earnings Overview</div>
+    <div class="card">
+      <div class="card-label">Total earnings this month</div>
+      <div class="card-value">$3,410.75</div>
+      <div class="card-row">
+        <div>
+          <div class="card-label">Pending payout</div>
+          <div class="card-value" style="font-size:18px;">$890.20</div>
+        </div>
+        <div>
+          <div class="card-label">Last payout</div>
+          <div class="card-value" style="font-size:18px;">$1,200.00</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-label">Recent earnings</div>
+      <ul style="padding-left:20px;margin:0;margin-top:8px;">
+        <li>$79.90 from Order #4021</li>
+        <li>$46.50 from Order #4018</li>
+        <li>$154.00 from Order #4015</li>
+      </ul>
+    </div>
+  </div>
+  <nav class="bottom-nav">
+    <a href="vendor-dashboard.html" class="nav-item">
+      <span class="nav-icon">🏠</span>Dashboard
+      <span class="nav-dot"></span>
+    </a>
+    <a href="vendor-listings.html" class="nav-item">
+      <span class="nav-icon">📋</span>Listings
+      <span class="nav-dot"></span>
+    </a>
+    <a href="vendor-orders.html" class="nav-item">
+      <span class="nav-icon">📦</span>Orders
+      <span class="nav-dot"></span>
+    </a>
+    <a href="vendor-earnings.html" class="nav-item active">
+      <span class="nav-icon">📈</span>Earnings
+      <span class="nav-dot"></span>
+    </a>
+    <a href="vendor-profile.html" class="nav-item">
+      <span class="nav-icon">👤</span>Profile
+      <span class="nav-dot"></span>
+    </a>
+  </nav>
+</body>
+</html>

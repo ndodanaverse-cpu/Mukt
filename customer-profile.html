@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mukoto Avenue — Profile</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232E7D32' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' dominant-baseline='middle'>🛍️</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      background: #FAFAFA;
+      font-family: 'Inter', sans-serif;
+      padding-bottom: 90px;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(160deg, #2E7D32 0%, #1B5E20 100%);
+      padding: 52px 20px 32px;
+      position: relative; overflow: hidden;
+    }
+    .header::before {
+      content: ''; position: absolute;
+      width: 220px; height: 220px; border-radius: 50%;
+      background: rgba(249,168,37,0.1);
+      top: -70px; right: -50px;
+    }
+    .header::after {
+      content: ''; position: absolute;
+      width: 140px; height: 140px; border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      bottom: -40px; left: 20px;
+    }
+
+    .header-top {
+      display: flex; justify-content: flex-end;
+      margin-bottom: 20px; position: relative; z-index: 2;
+    }
+    .settings-btn {
+      width: 38px; height: 38px;
+      background: rgba(255,255,255,0.15); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; cursor: pointer; border: none;
+      color: white; transition: all 0.2s;
+    }
+    .settings-btn:hover { background: rgba(255,255,255,0.25); }
+
+    /* Profile info */
+    .profile-info {
+      display: flex; align-items: center; gap: 16px;
+      position: relative; z-index: 2;
+    }
+    .avatar-wrap { position: relative; }
+    .avatar {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg, #F9A825, #F57F17);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; font-weight: 800; color: white;
+      font-family: 'Poppins', sans-serif;
+      border: 3px solid rgba(255,255,255,0.3);
+      overflow: hidden; cursor: pointer;
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-edit {
+      position: absolute; bottom: 0; right: 0;
+      width: 26px; height: 26px; border-radius: 50%;
+      background: #F9A825; border: 2px solid white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; cursor: pointer;
+    }
+
+    .profile-text { flex: 1; }
+    .profile-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 22px; font-weight: 800; color: white;
+      margin-bottom: 3px;
+    }
+    .profile-phone { font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 6px; }
+    .profile-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(249,168,37,0.25);
+      border: 1px solid rgba(249,168,37,0.4);
+      border-radius: 999px; padding: 4px 12px;
+      font-size: 11px; font-weight: 700; color: #F9A825;
+    }
+
+    /* ── Stats strip ── */
+    .stats-strip {
+      display: flex; background: white;
+      margin: 16px 16px 0; border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    .strip-stat {
+      flex: 1; padding: 14px 10px; text-align: center;
+      border-right: 1px solid #F3F4F6; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .strip-stat:hover { background: #F9FAFB; }
+    .strip-stat:last-child { border-right: none; }
+    .strip-val {
+      font-family: 'Poppins', sans-serif;
+      font-size: 20px; font-weight: 800; color: #1A1A1A;
+    }
+    .strip-label { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
+
+    /* ── Body ── */
+    .body { padding: 14px 16px 0; }
+
+    /* Section */
+    .section-card {
+      background: white; border-radius: 16px;
+      overflow: hidden; margin-bottom: 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    }
+    .section-header {
+      padding: 16px 18px 8px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px; font-weight: 800; color: #1A1A1A;
+      border-bottom: 1px solid #F9FAFB;
+    }
+
+    /* Settings row */
+    .setting-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 18px;
+      border-bottom: 1px solid #F9FAFB;
+      cursor: pointer; transition: background 0.15s;
+      text-decoration: none;
+    }
+    .setting-row:last-child { border-bottom: none; }
+    .setting-row:hover { background: #F9FAFB; }
+
+    .setting-icon {
+      width: 38px; height: 38px; border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px; flex-shrink: 0;
+    }
+
+    .setting-text { flex: 1; }
+    .setting-label {
+      font-size: 14px; font-weight: 600; color: #1A1A1A;
+    }
+    .setting-sub { font-size: 11px; color: #9CA3AF; margin-top: 1px; }
+
+    .setting-right {
+      display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+    }
+    .setting-arrow { font-size: 16px; color: #D1D5DB; }
+    .setting-badge {
+      background: #EF5350; color: white;
+      font-size: 10px; font-weight: 700;
+      padding: 2px 7px; border-radius: 999px;
+    }
+    .setting-value {
+      font-size: 12px; color: #9CA3AF; font-weight: 500;
+    }
+
+    /* Toggle in settings */
+    .mini-toggle {
+      width: 44px; height: 24px; border-radius: 999px;
+      background: #E5E7EB; position: relative;
+      cursor: pointer; transition: background 0.3s; flex-shrink: 0;
+    }
+    .mini-toggle.on { background: #2E7D32; }
+    .mini-toggle-knob {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: white; position: absolute; top: 2px; left: 2px;
+      transition: transform 0.3s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    }
+    .mini-toggle.on .mini-toggle-knob { transform: translateX(20px); }
+
+    /* Saved items preview */
+    .saved-scroll {
+      display: flex; gap: 10px; overflow-x: auto;
+      padding: 12px 18px;
+      scrollbar-width: none;
+    }
+    .saved-scroll::-webkit-scrollbar { display: none; }
+    .saved-thumb {
+      width: 64px; height: 64px; border-radius: 12px;
+      background: #F3F4F6; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; overflow: hidden; cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .saved-thumb:hover { transform: scale(1.05); }
+    .saved-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .saved-thumb.empty-slot {
+      border: 2px dashed #E5E7EB; font-size: 20px; color: #9CA3AF;
+    }
+
+    /* Log out button */
+    .logout-btn {
+      width: 100%; padding: 15px; border-radius: 14px;
+      border: 1.5px solid #fecaca; background: #fef2f2;
+      color: #EF5350;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center;
+      justify-content: center; gap: 8px;
+      margin: 0 16px; width: calc(100% - 32px);
+    }
+    .logout-btn:hover { background: #fee2e2; }
+
+    /* Edit profile sheet */
+    .sheet-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 200; opacity: 0;
+      pointer-events: none; transition: opacity 0.3s;
+    }
+    .sheet-overlay.show { opacity: 1; pointer-events: all; }
+    .edit-sheet {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: white; border-radius: 24px 24px 0 0;
+      z-index: 300; padding: 0 20px 40px;
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+      max-height: 85vh; overflow-y: auto; scrollbar-width: none;
+    }
+    .edit-sheet::-webkit-scrollbar { display: none; }
+    .edit-sheet.show { transform: translateY(0); }
+    .sheet-handle {
+      width: 40px; height: 4px; background: #E5E7EB;
+      border-radius: 999px; margin: 14px auto 20px;
+    }
+    .sheet-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 18px; font-weight: 800; color: #1A1A1A;
+      margin-bottom: 20px;
+    }
+    .field { margin-bottom: 16px; }
+    .field-label {
+      display: block; font-size: 12px; font-weight: 600;
+      color: #374151; margin-bottom: 7px;
+    }
+    .field-wrap { position: relative; }
+    .field-icon {
+      position: absolute; left: 13px; top: 50%;
+      transform: translateY(-50%); font-size: 15px; pointer-events: none;
+    }
+    .field-input {
+      width: 100%; padding: 13px 14px 13px 42px;
+      border: 1.5px solid #E5E7EB; border-radius: 12px;
+      font-size: 14px; color: #1A1A1A;
+      background: white; font-family: 'Inter', sans-serif;
+      transition: all 0.2s; outline: none;
+    }
+    .field-input:focus { border-color: #2E7D32; box-shadow: 0 0 0 3px rgba(46,125,50,0.1); }
+    .btn-save-profile {
+      width: 100%; padding: 15px; border-radius: 13px; border: none;
+      background: linear-gradient(135deg, #2E7D32, #1B5E20);
+      color: white; font-family: 'Poppins', sans-serif;
+      font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+      box-shadow: 0 4px 16px rgba(46,125,50,0.3);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-save-profile:hover { transform: translateY(-1px); }
+    .spinner-sm {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white; border-radius: 50%;
+      animation: spin 0.7s linear infinite; display: none;
+    }
+    .btn-save-profile.loading .spinner-sm { display: block; }
+    .btn-save-profile.loading .save-text { display: none; }
+
+    /* ── Bottom nav ── */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: white; border-top: 1px solid #F3F4F6;
+      display: flex; padding: 10px 0 20px; z-index: 200;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+    }
+    .nav-item {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; gap: 3px;
+      cursor: pointer; text-decoration: none; padding: 4px 0;
+    }
+    .nav-icon { font-size: 22px; }
+    .nav-label { font-size: 10px; font-weight: 600; color: #9CA3AF; }
+    .nav-item.active .nav-label { color: #2E7D32; }
+    .nav-dot { width: 4px; height: 4px; background: #2E7D32; border-radius: 50%; display: none; }
+    .nav-item.active .nav-dot { display: block; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 90px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      padding: 12px 20px; border-radius: 12px;
+      font-size: 13px; font-weight: 600; color: white;
+      opacity: 0; transition: all 0.3s; z-index: 1000;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      max-width: 90vw; text-align: center;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { background: #2E7D32; }
+    .toast.error   { background: #EF5350; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-top">
+      <button class="settings-btn" onclick="openEdit()">✏️</button>
+    </div>
+    <div class="profile-info">
+      <div class="avatar-wrap">
+        <div class="avatar" id="profileAvatar" onclick="openEdit()">?</div>
+        <div class="avatar-edit" onclick="openEdit()">✏️</div>
+      </div>
+      <div class="profile-text">
+        <div class="profile-name" id="profileName">Loading...</div>
+        <div class="profile-phone" id="profilePhone">—</div>
+        <div class="profile-badge">🛒 Customer</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats strip -->
+  <div class="stats-strip">
+    <div class="strip-stat" onclick="window.location.href='customer-orders.html'">
+      <div class="strip-val" id="statOrders">—</div>
+      <div class="strip-label">Orders</div>
+    </div>
+    <div class="strip-stat" onclick="window.location.href='customer-orders.html?tab=fulfilled'">
+      <div class="strip-val" id="statFulfilled">—</div>
+      <div class="strip-label">Fulfilled</div>
+    </div>
+    <div class="strip-stat">
+      <div class="strip-val" id="statSaved">—</div>
+      <div class="strip-label">Saved</div>
+    </div>
+    <div class="strip-stat">
+      <div class="strip-val" id="statFollowed">—</div>
+      <div class="strip-label">Following</div>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="body">
+
+    <!-- Saved items -->
+    <div class="section-card" id="savedSection" style="display:none;">
+      <div class="section-header">❤️ Saved Items</div>
+      <div class="saved-scroll" id="savedScroll"></div>
+    </div>
+
+    <!-- Account settings -->
+    <div class="section-card">
+      <div class="section-header">👤 Account</div>
+      <div class="setting-row" onclick="openEdit()">
+        <div class="setting-icon" style="background:#e8f5e9;">✏️</div>
+        <div class="setting-text">
+          <div class="setting-label">Edit Profile</div>
+          <div class="setting-sub">Name, phone, email</div>
+        </div>
+        <div class="setting-right"><div class="setting-arrow">›</div></div>
+      </div>
+      <a href="customer-orders.html" class="setting-row">
+        <div class="setting-icon" style="background:#e3f2fd;">📦</div>
+        <div class="setting-text">
+          <div class="setting-label">Order History</div>
+          <div class="setting-sub">View all your past orders</div>
+        </div>
+        <div class="setting-right">
+          <div class="setting-badge" id="pendingOrdersBadge" style="display:none;"></div>
+          <div class="setting-arrow">›</div>
+        </div>
+      </a>
+      <a href="shared-chat-list.html" class="setting-row">
+        <div class="setting-icon" style="background:#ede7f6;">💬</div>
+        <div class="setting-text">
+          <div class="setting-label">Messages</div>
+          <div class="setting-sub">Chat with vendors</div>
+        </div>
+        <div class="setting-right"><div class="setting-arrow">›</div></div>
+      </a>
+      <div class="setting-row" onclick="window.location.href='shared-notifications.html'">
+        <div class="setting-icon" style="background:#fffde7;">🔔</div>
+        <div class="setting-text">
+          <div class="setting-label">Notifications</div>
+          <div class="setting-sub">Manage your alerts</div>
+        </div>
+        <div class="setting-right"><div class="setting-arrow">›</div></div>
+      </div>
+    </div>
+
+    <!-- Preferences -->
+    <div class="section-card">
+      <div class="section-header">⚙️ Preferences</div>
+      <div class="setting-row">
+        <div class="setting-icon" style="background:#e8f5e9;">🌙</div>
+        <div class="setting-text">
+          <div class="setting-label">Dark Mode</div>
+          <div class="setting-sub">Coming soon</div>
+        </div>
+        <div class="setting-right">
+          <div class="mini-toggle" id="darkToggle" onclick="toggleSetting('dark')">
+            <div class="mini-toggle-knob"></div>
+          </div>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-icon" style="background:#fce4ec;">🔔</div>
+        <div class="setting-text">
+          <div class="setting-label">Push Notifications</div>
+          <div class="setting-sub">Order updates and offers</div>
+        </div>
+        <div class="setting-right">
+          <div class="mini-toggle on" id="notifToggle" onclick="toggleSetting('notif')">
+            <div class="mini-toggle-knob"></div>
+          </div>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-icon" style="background:#e3f2fd;">📍</div>
+        <div class="setting-text">
+          <div class="setting-label">Location Services</div>
+          <div class="setting-sub">For finding nearby vendors</div>
+        </div>
+        <div class="setting-right">
+          <div class="mini-toggle on" id="locationToggle" onclick="toggleSetting('location')">
+            <div class="mini-toggle-knob"></div>
+          </div>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-icon" style="background:#f3e5f5;">💱</div>
+        <div class="setting-text">
+          <div class="setting-label">Currency Display</div>
+          <div class="setting-sub">USD and ZWG shown</div>
+        </div>
+        <div class="setting-right">
+          <div class="setting-value">USD + ZWG</div>
+          <div class="setting-arrow">›</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Support -->
+    <div class="section-card">
+      <div class="section-header">🆘 Support</div>
+      <div class="setting-row" onclick="window.location.href='mailto:support@mukotoavenue.co.zw'">
+        <div class="setting-icon" style="background:#e8f5e9;">📧</div>
+        <div class="setting-text">
+          <div class="setting-label">Help & Support</div>
+          <div class="setting-sub">support@mukotoavenue.co.zw</div>
+        </div>
+        <div class="setting-right"><div class="setting-arrow">›</div></div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-icon" style="background:#e3f2fd;">📋</div>
+        <div class="setting-text">
+          <div class="setting-label">Terms of Service</div>
+          <div class="setting-sub">Read our terms</div>
+        </div>
+        <div class="setting-right"><div class="setting-arrow">›</div></div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-icon" style="background:#fffde7;">🔒</div>
+        <div class="setting-text">
+          <div class="setting-label">Privacy Policy</div>
+          <div class="setting-sub">How we use your data</div>
+        </div>
+        <div class="setting-right"><div class="setting-arrow">›</div></div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-icon" style="background:#F3F4F6;">ℹ️</div>
+        <div class="setting-text">
+          <div class="setting-label">About Mukoto Avenue</div>
+          <div class="setting-sub">Version 1.0.0 · Zimbabwe 2025</div>
+        </div>
+        <div class="setting-right"><div class="setting-arrow">›</div></div>
+      </div>
+    </div>
+
+    <!-- Become a vendor -->
+    <div style="background:linear-gradient(135deg,#1B5E20,#2E7D32);border-radius:16px;padding:20px;margin-bottom:14px;position:relative;overflow:hidden;cursor:pointer;"
+      onclick="becomeVendor()">
+      <div style="position:absolute;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.06);right:-20px;top:-40px;"></div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.7);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">For Sellers</div>
+      <div style="font-family:'Poppins',sans-serif;font-size:18px;font-weight:800;color:white;margin-bottom:8px;">Want to sell on Mukoto Avenue?</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.75);margin-bottom:14px;line-height:1.5;">Create a vendor account and reach thousands of customers in Harare.</div>
+      <div style="background:#F9A825;border:none;border-radius:10px;padding:10px 18px;font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;color:white;display:inline-block;">
+        Start Selling →
+      </div>
+    </div>
+
+    <!-- Log out -->
+    <button class="logout-btn" onclick="handleLogout()">🚪 Log Out</button>
+    <div style="height:16px;"></div>
+
+  </div>
+
+  <!-- Edit profile sheet -->
+  <div class="sheet-overlay" id="sheetOverlay" onclick="closeEdit()"></div>
+  <div class="edit-sheet" id="editSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Edit Profile</div>
+
+    <div style="display:flex;justify-content:center;margin-bottom:20px;">
+      <div style="position:relative;cursor:pointer;" onclick="changeAvatar()">
+        <div class="avatar" id="editAvatar" style="width:80px;height:80px;font-size:28px;">?</div>
+        <div class="avatar-edit">📷</div>
+      </div>
+    </div>
+
+    <div class="field-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div>
+        <label class="field-label">First Name</label>
+        <div class="field-wrap">
+          <span class="field-icon">👤</span>
+          <input class="field-input" id="editFirstName" type="text" placeholder="First name"/>
+        </div>
+      </div>
+      <div>
+        <label class="field-label">Last Name</label>
+        <div class="field-wrap">
+          <span class="field-icon">👤</span>
+          <input class="field-input" id="editLastName" type="text" placeholder="Last name"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Phone Number</label>
+      <div class="field-wrap">
+        <span class="field-icon">📞</span>
+        <input class="field-input" id="editPhone" type="tel" placeholder="+263 77 123 4567"/>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Email Address</label>
+      <div class="field-wrap">
+        <span class="field-icon">✉️</span>
+        <input class="field-input" id="editEmail" type="email" placeholder="you@email.com"/>
+      </div>
+    </div>
+
+    <button class="btn-save-profile" id="saveProfileBtn" onclick="saveProfile()">
+      <div class="spinner-sm"></div>
+      <span class="save-text">Save Changes</span>
+    </button>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <a href="customer-home.html" class="nav-item">
+      <div class="nav-icon">🏠</div><div class="nav-label">Home</div><div class="nav-dot"></div>
+    </a>
+    <a href="customer-map.html" class="nav-item">
+      <div class="nav-icon">🗺️</div><div class="nav-label">Map</div><div class="nav-dot"></div>
+    </a>
+    <a href="customer-orders.html" class="nav-item">
+      <div class="nav-icon">📦</div><div class="nav-label">Orders</div><div class="nav-dot"></div>
+    </a>
+    <a href="shared-chat-list.html" class="nav-item">
+      <div class="nav-icon">💬</div><div class="nav-label">Messages</div><div class="nav-dot"></div>
+    </a>
+    <a href="customer-profile.html" class="nav-item active">
+      <div class="nav-icon">👤</div><div class="nav-label">Profile</div><div class="nav-dot"></div>
+    </a>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getAuth, onAuthStateChanged, signOut, updateProfile
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getFirestore, doc, getDoc, updateDoc,
+      collection, query, where, getDocs, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2vGB7iehqse--Th5wds1MoU4ZHr_DYY4",
+      authDomain: "mukoto-avenue-3758a.firebaseapp.com",
+      projectId: "mukoto-avenue-3758a",
+      storageBucket: "mukoto-avenue-3758a.firebasestorage.app",
+      messagingSenderId: "172793539743",
+      appId: "1:172793539743:web:46fae0bd5be1ecedebc6aa",
+      measurementId: "G-VN9T6FEVJ0"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    let currentUser = null;
+    let userData    = null;
+
+    // ── Auth guard ───────────────────────────────────────────────
+    onAuthStateChanged(auth, async user => {
+      if (!user) { window.location.href = 'login.html'; return; }
+      currentUser = user;
+
+      const snap = await getDoc(doc(db, 'users', user.uid));
+      if (snap.exists()) {
+        userData = snap.data();
+        if (userData.role === 'vendor') {
+          window.location.href = 'vendor-profile.html'; return;
+        }
+        renderProfile(userData);
+      }
+
+      await loadStats();
+      loadSavedItems();
+    });
+
+    // ── Render profile ───────────────────────────────────────────
+    function renderProfile(data) {
+      const name     = `${data.firstName||''} ${data.lastName||''}`.trim() || 'Customer';
+      const initials = name.substring(0,2).toUpperCase();
+
+      document.getElementById('profileName').textContent  = name;
+      document.getElementById('profilePhone').textContent = data.phone || data.email || '—';
+
+      const avatarEl = document.getElementById('profileAvatar');
+      if (data.profilePhoto) {
+        avatarEl.innerHTML = `<img src="${data.profilePhoto}" onerror="this.style.display='none'">
+          <span>${initials}</span>`;
+      } else {
+        avatarEl.textContent = initials;
+      }
+
+      // Pre-fill edit form
+      document.getElementById('editFirstName').value = data.firstName || '';
+      document.getElementById('editLastName').value  = data.lastName  || '';
+      document.getElementById('editPhone').value     = data.phone     || '';
+      document.getElementById('editEmail').value     = data.email     || currentUser.email || '';
+      document.getElementById('editAvatar').textContent = initials;
+    }
+
+    // ── Load stats ───────────────────────────────────────────────
+    async function loadStats() {
+      try {
+        const q    = query(collection(db, 'orders'), where('customerId','==',currentUser.uid));
+        const snap = await getDocs(q);
+        const orders     = [];
+        snap.forEach(d => orders.push(d.data()));
+        const fulfilled  = orders.filter(o => o.orderStatus === 'fulfilled').length;
+        const pending    = orders.filter(o => ['pending','confirmed'].includes(o.orderStatus)).length;
+
+        document.getElementById('statOrders').textContent    = orders.length;
+        document.getElementById('statFulfilled').textContent = fulfilled;
+
+        if (pending > 0) {
+          const badge = document.getElementById('pendingOrdersBadge');
+          badge.style.display = 'block';
+          badge.textContent   = pending;
+        }
+      } catch (e) { console.error(e); }
+
+      const saved   = JSON.parse(localStorage.getItem('ma_saved')    || '[]');
+      const followed = JSON.parse(localStorage.getItem('ma_followed') || '[]');
+      document.getElementById('statSaved').textContent    = saved.length;
+      document.getElementById('statFollowed').textContent = followed.length;
+    }
+
+    // ── Load saved items ─────────────────────────────────────────
+    async function loadSavedItems() {
+      const saved = JSON.parse(localStorage.getItem('ma_saved') || '[]');
+      if (!saved.length) return;
+
+      const section = document.getElementById('savedSection');
+      section.style.display = 'block';
+
+      const scroll = document.getElementById('savedScroll');
+      const items  = saved.slice(0, 6);
+
+      try {
+        const thumbs = await Promise.all(items.map(async id => {
+          try {
+            const snap = await getDoc(doc(db, 'products', id));
+            if (!snap.exists()) return null;
+            const p = snap.data();
+            const img = p.images?.[0];
+            return `
+              <div class="saved-thumb" onclick="window.location.href='customer-product-detail.html?id=${id}'">
+                ${img ? `<img src="${img}" onerror="this.style.display='none'">` : ''}
+                <span>${catEmoji(p.category)}</span>
+              </div>`;
+          } catch { return null; }
+        }));
+
+        scroll.innerHTML = thumbs.filter(Boolean).join('');
+        if (saved.length > 6) {
+          scroll.innerHTML += `
+            <div class="saved-thumb" onclick="window.location.href='customer-search.html'"
+              style="background:#e8f5e9;font-size:13px;font-weight:700;color:#2E7D32;flex-direction:column;gap:2px;">
+              <span style="font-size:18px;">+${saved.length - 6}</span>
+              <span>more</span>
+            </div>`;
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    // ── Save profile ─────────────────────────────────────────────
+    window.saveProfile = async function() {
+      const btn = document.getElementById('saveProfileBtn');
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      const firstName = document.getElementById('editFirstName').value.trim();
+      const lastName  = document.getElementById('editLastName').value.trim();
+      const phone     = document.getElementById('editPhone').value.trim();
+      const email     = document.getElementById('editEmail').value.trim();
+
+      try {
+        await updateDoc(doc(db, 'users', currentUser.uid), {
+          firstName, lastName,
+          displayName: `${firstName} ${lastName}`.trim(),
+          phone, email,
+          updatedAt: serverTimestamp()
+        });
+        await updateProfile(currentUser, {
+          displayName: `${firstName} ${lastName}`.trim()
+        });
+
+        userData = { ...userData, firstName, lastName, phone, email };
+        renderProfile(userData);
+        closeEdit();
+        showToast('Profile updated ✅', 'success');
+      } catch (err) {
+        console.error(err);
+        showToast('Could not save. Please try again.', 'error');
+      } finally {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
+    };
+
+    // ── Log out ──────────────────────────────────────────────────
+    window.handleLogout = async function() {
+      if (!confirm('Are you sure you want to log out?')) return;
+      await signOut(auth);
+      localStorage.removeItem('ma_cart');
+      localStorage.removeItem('ma_saved');
+      window.location.href = 'login.html';
+    };
+
+    // ── Become vendor ────────────────────────────────────────────
+    window.becomeVendor = function() {
+      if (confirm('Switch your account to Vendor mode? This will update your role.')) {
+        window.location.href = 'signup.html';
+      }
+    };
+
+    // ── Edit sheet ───────────────────────────────────────────────
+    window.openEdit  = () => { document.getElementById('sheetOverlay').classList.add('show'); document.getElementById('editSheet').classList.add('show'); };
+    window.closeEdit = () => { document.getElementById('sheetOverlay').classList.remove('show'); document.getElementById('editSheet').classList.remove('show'); };
+
+    // ── Avatar change placeholder ────────────────────────────────
+    window.changeAvatar = () => showToast('Photo upload — enable Firebase Storage', 'error');
+
+    // ── Toggle settings ──────────────────────────────────────────
+    window.toggleSetting = function(id) {
+      const el = document.getElementById(id + 'Toggle');
+      el.classList.toggle('on');
+    };
+
+    // ── Helpers ──────────────────────────────────────────────────
+    function catEmoji(cat) {
+      const m = { Clothing:'👕', Shoes:'👟', Accessories:'👜', Bags:'🎒', Vintage:'🕶️', Wholesale:'📦', Kids:'🧒' };
+      return m[cat] || '🛍️';
+    }
+
+    window.showToast = function(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.className = `toast ${type} show`;
+      setTimeout(() => t.classList.remove('show'), 2500);
+    };
+  </script>
+
+</body>
+</html>

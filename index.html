@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mukoto Avenue</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232E7D32' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' dominant-baseline='middle'>🛍️</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(160deg, #2E7D32 0%, #1B5E20 60%, #0A2E0A 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Inter', sans-serif; overflow: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 28px 28px; pointer-events: none;
+    }
+    .blob { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.25; }
+    .blob-1 { width: 400px; height: 400px; background: #F9A825; top: -150px; right: -100px; }
+    .blob-2 { width: 300px; height: 300px; background: #4CAF50; bottom: -100px; left: -80px; }
+    .splash { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 2; padding: 24px; }
+    .logo-wrap { opacity: 0; transform: scale(0.6) translateY(20px); animation: popIn 0.8s cubic-bezier(0.34,1.56,0.64,1) 0.3s forwards; }
+    .logo-icon {
+      width: 110px; height: 110px;
+      background: linear-gradient(135deg, #F9A825, #F57F17);
+      border-radius: 32px; display: flex; align-items: center; justify-content: center;
+      font-size: 54px; margin: 0 auto 24px;
+      box-shadow: 0 20px 60px rgba(249,168,37,0.5), 0 0 0 1px rgba(255,255,255,0.15);
+      position: relative;
+      overflow: hidden;
+    }
+    .logo-icon img {
+      width: 90%;
+      height: 90%;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+    }
+    .logo-icon::before { content: ''; position: absolute; inset: -12px; border-radius: 44px; border: 2px solid rgba(249,168,37,0.3); animation: pulse 2s ease-in-out 1.2s infinite; }
+    .logo-icon::after { content: ''; position: absolute; inset: -24px; border-radius: 56px; border: 1.5px solid rgba(249,168,37,0.15); animation: pulse 2s ease-in-out 1.5s infinite; }
+    .logo-name { font-family: 'Poppins', sans-serif; font-size: 42px; font-weight: 800; color: #fff; letter-spacing: -1px; line-height: 1; margin-bottom: 4px; }
+    .logo-name span { color: #F9A825; }
+    .logo-sub { font-size: 13px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+    .tagline { opacity: 0; transform: translateY(16px); animation: fadeUp 0.7s ease 1s forwards; font-size: 17px; color: rgba(255,255,255,0.75); margin-top: 20px; max-width: 320px; line-height: 1.6; }
+    .pills { opacity: 0; animation: fadeUp 0.6s ease 1.3s forwards; display: flex; gap: 10px; margin-top: 28px; flex-wrap: wrap; justify-content: center; }
+    .pill { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 999px; padding: 7px 16px; font-size: 12px; color: rgba(255,255,255,0.8); font-weight: 500; display: flex; align-items: center; gap: 6px; }
+    .progress-wrap { opacity: 0; animation: fadeUp 0.5s ease 1.5s forwards; margin-top: 48px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .progress-bar { width: 160px; height: 3px; background: rgba(255,255,255,0.15); border-radius: 999px; overflow: hidden; }
+    .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #F9A825, #fff); border-radius: 999px; animation: fillBar 2.2s ease 1.8s forwards; }
+    .progress-text { font-size: 11px; color: rgba(255,255,255,0.35); letter-spacing: 1.5px; text-transform: uppercase; }
+    #statusMsg { opacity: 0; animation: fadeUp 0.5s ease 2s forwards; font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 8px; }
+    .flag-strip { position: fixed; bottom: 0; left: 0; right: 0; height: 4px; display: flex; opacity: 0; animation: fadeIn 0.5s ease 2s forwards; }
+    .flag-strip div { flex: 1; }
+    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: #EF5350; color: white; padding: 12px 24px; border-radius: 12px; font-size: 13px; font-weight: 600; opacity: 0; transition: all 0.3s; z-index: 100; white-space: nowrap; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    @keyframes popIn { to { opacity: 1; transform: scale(1) translateY(0); } }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { to { opacity: 1; } }
+    @keyframes fillBar { to { width: 100%; } }
+    @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.4; transform:scale(1.05); } }
+  </style>
+</head>
+<body>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="splash">
+    <div class="logo-wrap">
+      <div class="logo-icon">
+        <img src="logo.svg" alt="Mukoto Avenue Logo" />
+      </div>
+      <div class="logo-name">Mukoto<span>Avenue</span></div>
+      <div class="logo-sub">Zimbabwe's Street Market</div>
+    </div>
+    <div class="tagline">Your Street Market, Reimagined — shop from vendors near you, anywhere in Zimbabwe.</div>
+    <div class="pills">
+      <div class="pill">📍 Live vendor locations</div>
+      <div class="pill">💳 EcoCash payments</div>
+      <div class="pill">🛒 Shop from home</div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill"></div></div>
+      <div class="progress-text">Loading</div>
+      <div id="statusMsg">Checking your session...</div>
+    </div>
+  </div>
+  <div class="flag-strip">
+    <div style="background:#006400;"></div><div style="background:#FFD200;"></div>
+    <div style="background:#EF5350;"></div><div style="background:#000;"></div>
+    <div style="background:#fff;"></div><div style="background:#EF5350;"></div>
+    <div style="background:#FFD200;"></div><div style="background:#006400;"></div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2vGB7iehqse--Th5wds1MoU4ZHr_DYY4",
+      authDomain: "mukoto-avenue-3758a.firebaseapp.com",
+      projectId: "mukoto-avenue-3758a",
+      storageBucket: "mukoto-avenue-3758a.firebasestorage.app",
+      messagingSenderId: "172793539743",
+      appId: "1:172793539743:web:46fae0bd5be1ecedebc6aa",
+      measurementId: "G-VN9T6FEVJ0"
+    };
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+    const statusMsg = document.getElementById('statusMsg');
+    const minDelay  = new Promise(resolve => setTimeout(resolve, 2800));
+    const authCheck = new Promise(resolve => { onAuthStateChanged(auth, user => resolve(user)); });
+    Promise.all([minDelay, authCheck]).then(async ([, user]) => {
+      if (user) {
+        statusMsg.textContent = 'Welcome back...';
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists()) {
+            const role = userDoc.data().role;
+            window.location.href = role === 'vendor' ? 'vendor-dashboard.html' : 'customer-home.html';
+          } else {
+            window.location.href = 'signup.html';
+          }
+        } catch (err) {
+          showToast('Connection error. Please try again.');
+          setTimeout(() => window.location.href = 'login.html', 2000);
+        }
+      } else {
+        const visited = localStorage.getItem('ma_visited');
+        if (!visited) { localStorage.setItem('ma_visited', 'true'); window.location.href = 'onboarding.html'; }
+        else { window.location.href = 'login.html'; }
+      }
+    });
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+  </script>
+</body>
+</html>

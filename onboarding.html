@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mukoto Avenue — Welcome</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232E7D32' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' dominant-baseline='middle'>🛍️</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      height: 100vh;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+      background: #000;
+    }
+
+    /* ── Slides container ── */
+    .slides {
+      display: flex;
+      width: 300vw;
+      height: 100vh;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .slide {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Slide backgrounds ── */
+    .slide-1 { background: linear-gradient(160deg, #1a4a1a 0%, #0d2e0d 100%); }
+    .slide-2 { background: linear-gradient(160deg, #1a3a4a 0%, #0d1e2e 100%); }
+    .slide-3 { background: linear-gradient(160deg, #3a2a0d 0%, #1e150a 100%); }
+
+    /* ── Background pattern ── */
+    .slide::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 24px 24px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Illustration area ── */
+    .slide-visual {
+      flex: 0 0 55vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .visual-circle {
+      width: 260px; height: 260px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .slide-1 .visual-circle { background: radial-gradient(circle, rgba(46,125,50,0.4), rgba(27,94,32,0.2)); }
+    .slide-2 .visual-circle { background: radial-gradient(circle, rgba(25,118,210,0.4), rgba(13,71,161,0.2)); }
+    .slide-3 .visual-circle { background: radial-gradient(circle, rgba(249,168,37,0.4), rgba(245,127,23,0.2)); }
+
+    .visual-circle::before {
+      content: '';
+      position: absolute;
+      inset: -20px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.08);
+    }
+    .visual-circle::after {
+      content: '';
+      position: absolute;
+      inset: -40px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .visual-emoji {
+      font-size: 100px;
+      filter: drop-shadow(0 12px 32px rgba(0,0,0,0.4));
+      animation: float 3.5s ease-in-out infinite;
+    }
+
+    /* Floating badges around illustration */
+    .badge {
+      position: absolute;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.9);
+      font-weight: 600;
+      white-space: nowrap;
+      animation: floatBadge 4s ease-in-out infinite;
+    }
+
+    .badge-1 { top: 40px; right: 20px; animation-delay: 0s; }
+    .badge-2 { bottom: 60px; left: 10px; animation-delay: 1s; }
+    .badge-3 { top: 80px; left: 20px; animation-delay: 0.5s; }
+
+    /* ── Slide content ── */
+    .slide-content {
+      flex: 1;
+      background: white;
+      border-radius: 32px 32px 0 0;
+      padding: 36px 32px 0;
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slide-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f0faf0;
+      color: #2E7D32;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 999px;
+      margin-bottom: 16px;
+      width: fit-content;
+    }
+
+    .slide-2 .slide-tag { background: #e3f2fd; color: #1565C0; }
+    .slide-3 .slide-tag { background: #fffde7; color: #F57F17; }
+
+    .slide-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: #1A1A1A;
+      line-height: 1.2;
+      margin-bottom: 14px;
+    }
+
+    .slide-title .accent { color: #2E7D32; }
+    .slide-2 .slide-title .accent { color: #1565C0; }
+    .slide-3 .slide-title .accent { color: #F57F17; }
+
+    .slide-desc {
+      font-size: 15px;
+      color: #6B7280;
+      line-height: 1.75;
+    }
+
+    /* ── Footer (fixed at bottom) ── */
+    .onboarding-footer {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: white;
+      padding: 20px 32px 40px;
+      z-index: 100;
+      border-top: 1px solid #F3F4F6;
+    }
+
+    .footer-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    /* Dots */
+    .dots { display: flex; gap: 8px; align-items: center; }
+    .dot {
+      height: 8px; width: 8px;
+      border-radius: 999px;
+      background: #E5E7EB;
+      cursor: pointer;
+      transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+    }
+    .dot.active { background: #2E7D32; width: 28px; }
+
+    /* Skip */
+    .btn-skip {
+      font-size: 13px; font-weight: 600;
+      color: #9CA3AF; background: none; border: none;
+      cursor: pointer; padding: 4px 0;
+      transition: color 0.2s;
+    }
+    .btn-skip:hover { color: #374151; }
+
+    /* Next / Get Started */
+    .btn-next {
+      width: 100%;
+      padding: 16px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, #2E7D32, #1B5E20);
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 6px 20px rgba(46,125,50,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      letter-spacing: 0.3px;
+    }
+    .btn-next:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(46,125,50,0.45);
+    }
+    .btn-next:active { transform: translateY(0); }
+
+    .btn-next.gold {
+      background: linear-gradient(135deg, #F9A825, #F57F17);
+      box-shadow: 0 6px 20px rgba(249,168,37,0.4);
+    }
+    .btn-next.gold:hover { box-shadow: 0 10px 28px rgba(249,168,37,0.5); }
+
+    /* Arrow icon */
+    .arrow {
+      width: 22px; height: 22px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+    }
+
+    /* Login link */
+    .login-link {
+      text-align: center;
+      font-size: 13px;
+      color: #9CA3AF;
+      margin-top: 14px;
+    }
+    .login-link a {
+      color: #2E7D32;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .login-link a:hover { text-decoration: underline; }
+
+    /* ── Animations ── */
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-14px); }
+    }
+    @keyframes floatBadge {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    /* Touch/swipe hint */
+    .swipe-hint {
+      position: absolute;
+      bottom: 160px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      color: rgba(0,0,0,0.25);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 50;
+      animation: fadeOut 1s ease 4s forwards;
+    }
+
+    @keyframes fadeOut {
+      to { opacity: 0; pointer-events: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Slides -->
+<div class="slides" id="slides">
+
+  <!-- Slide 1 -->
+  <div class="slide slide-1">
+    <div class="slide-visual">
+      <div class="visual-circle">
+        <div class="visual-emoji">🗺️</div>
+        <div class="badge badge-1">📍 0.4km away</div>
+        <div class="badge badge-2">⭐ 4.8 · Tafadzwa's Threads</div>
+        <div class="badge badge-3">🟢 Open Now</div>
+      </div>
+    </div>
+    <div class="slide-content">
+      <div class="slide-tag">✦ Discover</div>
+      <div class="slide-title">Shop the streets,<br/><span class="accent">from your phone</span></div>
+      <div class="slide-desc">Discover vendors near you on a live map. Browse their full catalogue, check prices in USD or ZWG, and order without leaving home.</div>
+    </div>
+  </div>
+
+  <!-- Slide 2 -->
+  <div class="slide slide-2">
+    <div class="slide-visual">
+      <div class="visual-circle">
+        <div class="visual-emoji">🏪</div>
+        <div class="badge badge-1">🛍️ 4 Active Listings</div>
+        <div class="badge badge-2">📦 2 Orders Today</div>
+        <div class="badge badge-3">💰 $47 Earned</div>
+      </div>
+    </div>
+    <div class="slide-content">
+      <div class="slide-tag">✦ For Vendors</div>
+      <div class="slide-title">Your real<br/><span class="accent">digital storefront</span></div>
+      <div class="slide-desc">List your products, manage orders, and build a loyal customer base — all from your phone. No laptop, no tech skills needed. Just sell.</div>
+    </div>
+  </div>
+
+  <!-- Slide 3 -->
+  <div class="slide slide-3">
+    <div class="slide-visual">
+      <div class="visual-circle">
+        <div class="visual-emoji">💳</div>
+        <div class="badge badge-1">✅ Payment Confirmed</div>
+        <div class="badge badge-2">📱 EcoCash · OneMoney</div>
+        <div class="badge badge-3">🔒 Secure Checkout</div>
+      </div>
+    </div>
+    <div class="slide-content">
+      <div class="slide-tag">✦ Payments</div>
+      <div class="slide-title">Pay safely with<br/><span class="accent">mobile money</span></div>
+      <div class="slide-desc">Checkout using EcoCash, OneMoney, or Telecash. Payments go directly to vendors — fast, secure, and built for Zimbabwe.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Swipe hint -->
+<div class="swipe-hint">← swipe to explore →</div>
+
+<!-- Footer -->
+<div class="onboarding-footer">
+  <div class="footer-top">
+    <div class="dots">
+      <div class="dot active" id="d0" onclick="goTo(0)"></div>
+      <div class="dot" id="d1" onclick="goTo(1)"></div>
+      <div class="dot" id="d2" onclick="goTo(2)"></div>
+    </div>
+    <button class="btn-skip" id="skipBtn" onclick="goToSignup()">Skip</button>
+  </div>
+
+  <button class="btn-next" id="mainBtn" onclick="handleMain()">
+    <span id="btnLabel">Next</span>
+    <div class="arrow" id="btnArrow">→</div>
+  </button>
+
+  <div class="login-link">
+    Already have an account? <a href="login.html">Log In</a>
+  </div>
+</div>
+
+<script>
+  let current = 0;
+  const total = 3;
+
+  function goTo(index) {
+    current = index;
+    document.getElementById('slides').style.transform = `translateX(-${current * 100}vw)`;
+
+    // Update dots
+    for (let i = 0; i < total; i++) {
+      document.getElementById('d' + i).classList.toggle('active', i === current);
+    }
+
+    // Update button
+    const isLast = current === total - 1;
+    const btn = document.getElementById('mainBtn');
+    const label = document.getElementById('btnLabel');
+    const arrow = document.getElementById('btnArrow');
+    const skip = document.getElementById('skipBtn');
+
+    if (isLast) {
+      btn.classList.add('gold');
+      label.textContent = "Get Started — It's Free";
+      arrow.textContent = '🚀';
+      skip.style.display = 'none';
+    } else {
+      btn.classList.remove('gold');
+      label.textContent = 'Next';
+      arrow.textContent = '→';
+      skip.style.display = 'block';
+    }
+  }
+
+  function handleMain() {
+    if (current < total - 1) {
+      goTo(current + 1);
+    } else {
+      goToSignup();
+    }
+  }
+
+  function goToSignup() {
+    window.location.href = 'signup.html';
+  }
+
+  // ── Touch/swipe support ──────────────────────────────────────
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  document.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  document.addEventListener('touchend', e => {
+    touchEndX = e.changedTouches[0].screenX;
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0 && current < total - 1) goTo(current + 1);
+      if (diff < 0 && current > 0) goTo(current - 1);
+    }
+  }, { passive: true });
+
+  // ── Keyboard navigation ──────────────────────────────────────
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' && current < total - 1) goTo(current + 1);
+    if (e.key === 'ArrowLeft' && current > 0) goTo(current - 1);
+  });
+</script>
+
+</body>
+</html>

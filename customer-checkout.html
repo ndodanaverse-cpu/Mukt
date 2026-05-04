@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mukoto Avenue — Checkout</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232E7D32' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' dominant-baseline='middle'>🛍️</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      background: #FAFAFA;
+      font-family: 'Inter', sans-serif;
+      padding-bottom: 120px;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(160deg, #2E7D32 0%, #1B5E20 100%);
+      padding: 52px 20px 24px;
+      position: relative; overflow: hidden;
+    }
+    .header::before {
+      content: ''; position: absolute;
+      width: 200px; height: 200px; border-radius: 50%;
+      background: rgba(249,168,37,0.1);
+      top: -60px; right: -40px;
+    }
+    .header-row {
+      display: flex; align-items: center;
+      gap: 14px; position: relative; z-index: 2;
+    }
+    .back-btn {
+      width: 40px; height: 40px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; cursor: pointer; border: none;
+      color: white; text-decoration: none; transition: all 0.2s;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.25); }
+    .header-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 20px; font-weight: 800; color: white;
+    }
+    .header-sub {
+      font-size: 13px; color: rgba(255,255,255,0.7);
+      margin-top: 2px; position: relative; z-index: 2;
+      padding-left: 54px;
+    }
+
+    /* Steps indicator */
+    .steps {
+      display: flex; align-items: center;
+      padding: 16px 20px 0;
+      position: relative; z-index: 2;
+    }
+    .step {
+      display: flex; align-items: center;
+      gap: 6px; flex: 1;
+    }
+    .step-circle {
+      width: 26px; height: 26px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; flex-shrink: 0;
+    }
+    .step-circle.done { background: #F9A825; color: white; }
+    .step-circle.active { background: white; color: #2E7D32; }
+    .step-circle.pending { background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.6); }
+    .step-label {
+      font-size: 11px; font-weight: 600;
+    }
+    .step-label.done { color: #F9A825; }
+    .step-label.active { color: white; }
+    .step-label.pending { color: rgba(255,255,255,0.5); }
+    .step-line {
+      flex: 1; height: 1px;
+      background: rgba(255,255,255,0.2);
+      margin: 0 6px;
+    }
+
+    /* ── Body ── */
+    .body { padding: 20px 16px 0; }
+
+    /* Section card */
+    .section-card {
+      background: white; border-radius: 16px;
+      padding: 18px; margin-bottom: 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    }
+    .section-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px; font-weight: 800; color: #1A1A1A;
+      margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* Order summary collapsed */
+    .order-summary-toggle {
+      display: flex; align-items: center;
+      justify-content: space-between; cursor: pointer;
+    }
+    .order-summary-toggle .left {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .order-count {
+      background: #2E7D32; color: white;
+      width: 22px; height: 22px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700;
+    }
+    .toggle-arrow {
+      font-size: 16px; color: #9CA3AF;
+      transition: transform 0.3s;
+    }
+    .toggle-arrow.open { transform: rotate(180deg); }
+
+    .order-items-list {
+      margin-top: 14px; display: none;
+      border-top: 1px solid #F3F4F6;
+      padding-top: 14px;
+    }
+    .order-items-list.show { display: block; }
+    .order-item-row {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 10px;
+    }
+    .order-item-img {
+      width: 42px; height: 42px; border-radius: 10px;
+      background: #F3F4F6;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0; overflow: hidden;
+    }
+    .order-item-img img { width: 100%; height: 100%; object-fit: cover; }
+    .order-item-name {
+      flex: 1; font-size: 13px; font-weight: 600; color: #1A1A1A;
+      display: -webkit-box; -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical; overflow: hidden;
+      line-clamp: 1;
+    }
+    .order-item-qty { font-size: 12px; color: #9CA3AF; }
+    .order-item-price { font-size: 13px; font-weight: 700; color: #2E7D32; }
+
+    /* Delivery address */
+    .address-row {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px; background: #F9FAFB; border-radius: 12px;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .address-row:hover { background: #F0FDF4; }
+    .address-icon {
+      font-size: 20px; margin-top: 2px;
+    }
+    .address-text { flex: 1; }
+    .address-type {
+      font-size: 11px; font-weight: 700; color: #2E7D32;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 3px;
+    }
+    .address-val { font-size: 13px; color: #374151; font-weight: 500; line-height: 1.5; }
+    .address-edit { font-size: 20px; color: #9CA3AF; }
+
+    /* ── Payment methods ── */
+    .payment-methods { display: flex; flex-direction: column; gap: 10px; }
+
+    .payment-option {
+      border: 2px solid #E5E7EB;
+      border-radius: 14px; padding: 14px 16px;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; gap: 14px;
+      position: relative;
+    }
+    .payment-option:hover { border-color: #86EFAC; }
+    .payment-option.selected {
+      border-color: #2E7D32;
+      background: linear-gradient(135deg, #f0faf0, #e8f5e9);
+      box-shadow: 0 3px 14px rgba(46,125,50,0.15);
+    }
+
+    .payment-logo {
+      width: 46px; height: 46px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0; font-weight: 800;
+    }
+    .ecocash-logo { background: linear-gradient(135deg, #E53935, #B71C1C); color: white; font-size: 13px; }
+    .onemoney-logo { background: linear-gradient(135deg, #1565C0, #0D47A1); color: white; font-size: 12px; }
+    .telecash-logo { background: linear-gradient(135deg, #FF6F00, #E65100); color: white; font-size: 12px; }
+    .cash-logo { background: linear-gradient(135deg, #2E7D32, #1B5E20); color: white; font-size: 11px; }
+
+    .payment-info { flex: 1; }
+    .payment-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px; font-weight: 700; color: #1A1A1A;
+      margin-bottom: 2px;
+    }
+    .payment-desc { font-size: 11px; color: #6B7280; }
+
+    .payment-radio {
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 2px solid #E5E7EB;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s; flex-shrink: 0;
+    }
+    .payment-option.selected .payment-radio {
+      border-color: #2E7D32; background: #2E7D32;
+    }
+    .payment-option.selected .payment-radio::after {
+      content: ''; width: 8px; height: 8px;
+      border-radius: 50%; background: white;
+    }
+
+    /* Phone input (shows for mobile money) */
+    .phone-input-wrap {
+      margin-top: 12px; display: none;
+    }
+    .phone-input-wrap.show { display: block; }
+    .phone-label {
+      font-size: 12px; font-weight: 600; color: #374151;
+      margin-bottom: 6px; display: block;
+    }
+    .phone-field-wrap { position: relative; }
+    .phone-icon {
+      position: absolute; left: 13px; top: 50%;
+      transform: translateY(-50%); font-size: 15px; pointer-events: none;
+    }
+    .phone-field {
+      width: 100%; padding: 13px 13px 13px 40px;
+      border: 1.5px solid #E5E7EB; border-radius: 12px;
+      font-size: 14px; font-family: 'Inter', sans-serif;
+      outline: none; color: #1A1A1A;
+      transition: border-color 0.2s;
+    }
+    .phone-field:focus { border-color: #2E7D32; box-shadow: 0 0 0 3px rgba(46,125,50,0.1); }
+
+    /* ── Price breakdown ── */
+    .price-row {
+      display: flex; justify-content: space-between;
+      align-items: center; padding: 8px 0;
+      border-bottom: 1px solid #F9FAFB;
+      font-size: 14px;
+    }
+    .price-row:last-child { border-bottom: none; }
+    .price-label { color: #6B7280; }
+    .price-val { font-weight: 600; color: #1A1A1A; }
+    .price-val.green { color: #2E7D32; }
+    .price-total {
+      display: flex; justify-content: space-between;
+      align-items: center; padding-top: 12px;
+      border-top: 2px solid #F3F4F6; margin-top: 4px;
+    }
+    .price-total-label {
+      font-family: 'Poppins', sans-serif;
+      font-size: 16px; font-weight: 800; color: #1A1A1A;
+    }
+    .price-total-val {
+      font-family: 'Poppins', sans-serif;
+      font-size: 24px; font-weight: 800; color: #2E7D32;
+    }
+    .price-total-zwg { font-size: 11px; color: #9CA3AF; text-align: right; }
+
+    /* Security note */
+    .security-note {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 14px; background: #F0FDF4;
+      border-radius: 10px; margin-top: 10px;
+      font-size: 12px; color: #2E7D32; font-weight: 500;
+    }
+
+    /* ── CTA bar ── */
+    .cta-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: white; padding: 14px 16px 32px;
+      border-top: 1px solid #F3F4F6; z-index: 200;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+    }
+    .btn-pay {
+      width: 100%; padding: 17px;
+      border-radius: 14px; border: none;
+      background: linear-gradient(135deg, #2E7D32, #1B5E20);
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      font-size: 16px; font-weight: 800;
+      cursor: pointer; transition: all 0.2s;
+      box-shadow: 0 6px 20px rgba(46,125,50,0.4);
+      display: flex; align-items: center;
+      justify-content: center; gap: 10px;
+      position: relative; overflow: hidden;
+    }
+    .btn-pay:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(46,125,50,0.5); }
+    .btn-pay:disabled { opacity: 0.6; cursor: not-allowed; }
+    .pay-spinner {
+      width: 20px; height: 20px;
+      border: 2.5px solid rgba(255,255,255,0.3);
+      border-top-color: white; border-radius: 50%;
+      animation: spin 0.7s linear infinite; display: none;
+    }
+    .btn-pay.loading .pay-spinner { display: block; }
+    .btn-pay.loading .pay-text { display: none; }
+
+    /* ── Payment processing modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(6px);
+      z-index: 500; display: none;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: white; border-radius: 24px;
+      padding: 40px 32px; text-align: center;
+      max-width: 340px; width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      animation: modalIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    .modal-icon { font-size: 52px; margin-bottom: 16px; }
+    .modal-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 20px; font-weight: 800; color: #1A1A1A;
+      margin-bottom: 8px;
+    }
+    .modal-sub { font-size: 14px; color: #6B7280; line-height: 1.6; }
+    .modal-spinner {
+      width: 48px; height: 48px;
+      border: 4px solid #E5E7EB;
+      border-top-color: #2E7D32;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 20px auto 0;
+    }
+    .modal-steps {
+      margin-top: 20px; text-align: left;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .modal-step {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13px; color: #9CA3AF;
+      transition: color 0.3s;
+    }
+    .modal-step.active { color: #2E7D32; font-weight: 600; }
+    .modal-step.done { color: #1A1A1A; }
+    .modal-step-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #E5E7EB; flex-shrink: 0; transition: background 0.3s;
+    }
+    .modal-step.active .modal-step-dot { background: #2E7D32; }
+    .modal-step.done .modal-step-dot { background: #4CAF50; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 110px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      padding: 12px 20px; border-radius: 12px;
+      font-size: 13px; font-weight: 600; color: white;
+      opacity: 0; transition: all 0.3s; z-index: 600;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      max-width: 90vw; text-align: center;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { background: #2E7D32; }
+    .toast.error { background: #EF5350; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-row">
+      <a href="customer-cart.html" class="back-btn">←</a>
+      <div>
+        <div class="header-title">Checkout</div>
+      </div>
+    </div>
+    <div class="header-sub">Review your order and pay securely</div>
+    <!-- Steps -->
+    <div class="steps">
+      <div class="step">
+        <div class="step-circle done">✓</div>
+        <div class="step-label done">Cart</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step">
+        <div class="step-circle active">2</div>
+        <div class="step-label active">Checkout</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step">
+        <div class="step-circle pending">3</div>
+        <div class="step-label pending">Done</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- Order summary -->
+    <div class="section-card">
+      <div class="order-summary-toggle" onclick="toggleSummary()">
+        <div class="left">
+          <div class="section-title" style="margin-bottom:0;">📦 Order Summary</div>
+          <div class="order-count" id="orderCount">0</div>
+        </div>
+        <div class="toggle-arrow" id="toggleArrow">▾</div>
+      </div>
+      <div class="order-items-list" id="orderItemsList"></div>
+    </div>
+
+    <!-- Delivery -->
+    <div class="section-card">
+      <div class="section-title">📍 Delivery / Pickup</div>
+      <div class="address-row">
+        <div class="address-icon">📍</div>
+        <div class="address-text">
+          <div class="address-type">Pickup from vendor</div>
+          <div class="address-val" id="addressVal">Harare, Zimbabwe · Confirm with vendor via chat</div>
+        </div>
+        <div class="address-edit">›</div>
+      </div>
+    </div>
+
+    <!-- Payment methods -->
+    <div class="section-card">
+      <div class="section-title">💳 Payment Method</div>
+      <div class="payment-methods">
+
+        <div class="payment-option selected" id="pay-ecocash" onclick="selectPayment('ecocash')">
+          <div class="payment-logo ecocash-logo">EC</div>
+          <div class="payment-info">
+            <div class="payment-name">EcoCash</div>
+            <div class="payment-desc">Pay with your EcoCash mobile wallet</div>
+          </div>
+          <div class="payment-radio"></div>
+        </div>
+
+        <div class="payment-option" id="pay-onemoney" onclick="selectPayment('onemoney')">
+          <div class="payment-logo onemoney-logo">1$</div>
+          <div class="payment-info">
+            <div class="payment-name">OneMoney</div>
+            <div class="payment-desc">Pay with NetOne OneMoney</div>
+          </div>
+          <div class="payment-radio"></div>
+        </div>
+
+        <div class="payment-option" id="pay-telecash" onclick="selectPayment('telecash')">
+          <div class="payment-logo telecash-logo">TC</div>
+          <div class="payment-info">
+            <div class="payment-name">Telecash</div>
+            <div class="payment-desc">Pay with Telecel Telecash</div>
+          </div>
+          <div class="payment-radio"></div>
+        </div>
+
+        <div class="payment-option" id="pay-cash" onclick="selectPayment('cash')">
+          <div class="payment-logo cash-logo">💵</div>
+          <div class="payment-info">
+            <div class="payment-name">Cash on Pickup</div>
+            <div class="payment-desc">Pay in cash when you collect</div>
+          </div>
+          <div class="payment-radio"></div>
+        </div>
+
+      </div>
+
+      <!-- Mobile number input -->
+      <div class="phone-input-wrap show" id="phoneInputWrap">
+        <label class="phone-label">Mobile Money Number</label>
+        <div class="phone-field-wrap">
+          <span class="phone-icon">📱</span>
+          <input class="phone-field" id="phoneField" type="tel"
+            placeholder="+263 77 123 4567" value=""/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Price breakdown -->
+    <div class="section-card">
+      <div class="section-title">🧾 Price Breakdown</div>
+      <div class="price-row">
+        <div class="price-label">Subtotal</div>
+        <div class="price-val" id="breakSubtotal">$0.00</div>
+      </div>
+      <div class="price-row">
+        <div class="price-label">Service Fee</div>
+        <div class="price-val">$0.50</div>
+      </div>
+      <div class="price-row" id="discountBreakRow" style="display:none;">
+        <div class="price-label">Discount</div>
+        <div class="price-val green" id="discountBreakVal">-$0.00</div>
+      </div>
+      <div class="price-total">
+        <div class="price-total-label">Total</div>
+        <div>
+          <div class="price-total-val" id="breakTotal">$0.00</div>
+          <div class="price-total-zwg" id="breakTotalZwg">ZWG 0</div>
+        </div>
+      </div>
+      <div class="security-note">
+        🔒 Your payment is secured by Paynow Zimbabwe
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CTA bar -->
+  <div class="cta-bar">
+    <button class="btn-pay" id="payBtn" onclick="handlePay()">
+      <div class="pay-spinner"></div>
+      <span class="pay-text" id="payBtnText">Pay $0.00 Now →</span>
+    </button>
+  </div>
+
+  <!-- Processing modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-icon" id="modalIcon">💳</div>
+      <div class="modal-title" id="modalTitle">Processing Payment</div>
+      <div class="modal-sub" id="modalSub">Please wait while we contact your mobile money provider...</div>
+      <div class="modal-spinner" id="modalSpinner"></div>
+      <div class="modal-steps" id="modalSteps">
+        <div class="modal-step active" id="mStep1">
+          <div class="modal-step-dot"></div>
+          Connecting to payment provider...
+        </div>
+        <div class="modal-step" id="mStep2">
+          <div class="modal-step-dot"></div>
+          Sending payment request...
+        </div>
+        <div class="modal-step" id="mStep3">
+          <div class="modal-step-dot"></div>
+          Confirming transaction...
+        </div>
+        <div class="modal-step" id="mStep4">
+          <div class="modal-step-dot"></div>
+          Creating your order...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getFirestore, collection, addDoc,
+      doc, getDoc, serverTimestamp, writeBatch
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2vGB7iehqse--Th5wds1MoU4ZHr_DYY4",
+      authDomain: "mukoto-avenue-3758a.firebaseapp.com",
+      projectId: "mukoto-avenue-3758a",
+      storageBucket: "mukoto-avenue-3758a.firebasestorage.app",
+      messagingSenderId: "172793539743",
+      appId: "1:172793539743:web:46fae0bd5be1ecedebc6aa",
+      measurementId: "G-VN9T6FEVJ0"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    let currentUser   = null;
+    let selectedMethod = 'ecocash';
+    const SERVICE_FEE  = 0.50;
+    const ZWG_RATE     = 36;
+
+    // ── Auth guard ───────────────────────────────────────────────
+    onAuthStateChanged(auth, async user => {
+      if (!user) { window.location.href = 'login.html'; return; }
+      currentUser = user;
+
+      // Pre-fill phone from user profile
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        if (snap.exists() && snap.data().phone) {
+          document.getElementById('phoneField').value = snap.data().phone;
+        }
+      } catch (_) {}
+
+      loadCheckout();
+    });
+
+    // ── Load checkout data ───────────────────────────────────────
+    function loadCheckout() {
+      const cart  = JSON.parse(localStorage.getItem('ma_cart') || '[]');
+      if (!cart.length) { window.location.href = 'customer-cart.html'; return; }
+
+      const subtotal = cart.reduce((s, i) => s + (Number(i.price||0) * (i.qty||1)), 0);
+      const total    = subtotal + SERVICE_FEE;
+      const totalZwg = total * ZWG_RATE;
+
+      // Order count
+      const itemCount = cart.reduce((s, i) => s + (i.qty||1), 0);
+      document.getElementById('orderCount').textContent = itemCount;
+
+      // Order items list
+      document.getElementById('orderItemsList').innerHTML = cart.map(item => {
+        const emoji = catEmoji(item.category);
+        return `
+          <div class="order-item-row">
+            <div class="order-item-img">
+              ${item.image ? `<img src="${item.image}" onerror="this.style.display='none'">` : ''}
+              <span>${emoji}</span>
+            </div>
+            <div class="order-item-name">${item.title} ${item.qty > 1 ? `x${item.qty}` : ''}</div>
+            <div class="order-item-price">$${(Number(item.price||0) * (item.qty||1)).toFixed(2)}</div>
+          </div>`;
+      }).join('');
+
+      // Price breakdown
+      document.getElementById('breakSubtotal').textContent = `$${subtotal.toFixed(2)}`;
+      document.getElementById('breakTotal').textContent    = `$${total.toFixed(2)}`;
+      document.getElementById('breakTotalZwg').textContent = `ZWG ${totalZwg.toFixed(0)}`;
+      document.getElementById('payBtnText').textContent    = `Pay $${total.toFixed(2)} Now →`;
+    }
+
+    // ── Payment method selection ─────────────────────────────────
+    window.selectPayment = function(method) {
+      selectedMethod = method;
+      document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('selected'));
+      document.getElementById(`pay-${method}`).classList.add('selected');
+
+      const isMobileMoney = ['ecocash', 'onemoney', 'telecash'].includes(method);
+      document.getElementById('phoneInputWrap').classList.toggle('show', isMobileMoney);
+    };
+
+    // ── Toggle order summary ─────────────────────────────────────
+    window.toggleSummary = function() {
+      const list  = document.getElementById('orderItemsList');
+      const arrow = document.getElementById('toggleArrow');
+      list.classList.toggle('show');
+      arrow.classList.toggle('open');
+    };
+
+    // ── Handle payment ───────────────────────────────────────────
+    window.handlePay = async function() {
+      const isMobileMoney = ['ecocash', 'onemoney', 'telecash'].includes(selectedMethod);
+
+      if (isMobileMoney) {
+        const phone = document.getElementById('phoneField').value.trim();
+        if (!phone || phone.length < 9) {
+          showToast('Enter a valid mobile number', 'error');
+          return;
+        }
+      }
+
+      const btn = document.getElementById('payBtn');
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      showModal();
+
+      try {
+        const cart     = JSON.parse(localStorage.getItem('ma_cart') || '[]');
+        const notes    = localStorage.getItem('ma_order_notes') || '';
+        const subtotal = cart.reduce((s,i) => s + (Number(i.price||0) * (i.qty||1)), 0);
+        const total    = subtotal + SERVICE_FEE;
+        const email    = currentUser.email || 'customer@mukoto.avenue';
+        const phone    = document.getElementById('phoneField')?.value || '';
+
+        // Generate order reference
+        const orderRef = `ORD-${Date.now()}-${currentUser.uid.slice(0,6).toUpperCase()}`;
+
+        // ── Call Paynow payment gateway ────────────────────────────
+        const paymentRes = await fetch('/api/pay', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            reference: orderRef,
+            amount: total.toFixed(2),
+            email: email,
+            phone: phone,
+            method: selectedMethod,
+            description: `Mukoto Ave Order - ${cart.length} item(s)`
+          })
+        }).catch(err => {
+          console.error('❌ Fetch error:', err);
+          throw new Error(`Network error: ${err.message}. Make sure the server is running on port 3000.`);
+        });
+
+        if (!paymentRes.ok) {
+          throw new Error(`Payment initiation failed: ${paymentRes.statusText}`);
+        }
+
+        const paymentData = await paymentRes.json();
+
+        if (!paymentData.success) {
+          throw new Error(paymentData.error || 'Could not initiate payment');
+        }
+
+        // ── Cash on Pickup: skip polling, go straight to order creation ─
+        let paid = paymentData.cash === true;
+
+        if (!paid) {
+          // Mobile money — show prompt and poll Paynow
+          const methodLabels = { ecocash: 'EcoCash', onemoney: 'OneMoney', telecash: 'Telecash' };
+          const label = methodLabels[selectedMethod] || 'mobile money';
+          document.getElementById('modalIcon').textContent  = '📱';
+          document.getElementById('modalTitle').textContent = 'Complete Payment';
+          document.getElementById('modalSub').textContent   = `Check your phone for the ${label} USSD prompt...`;
+          document.getElementById('modalSteps').style.display = 'none';
+
+          let attempts = 0;
+          const maxAttempts = 30; // ~2.5 minutes
+
+          while (!paid && attempts < maxAttempts) {
+            await new Promise(r => setTimeout(r, 5000));
+            const statusRes  = await fetch(`/api/status?pollUrl=${encodeURIComponent(paymentData.pollUrl)}`);
+            const statusData = await statusRes.json();
+            if (statusData.paid) { paid = true; break; }
+            attempts++;
+          }
+
+          if (!paid) throw new Error('Payment timeout. Please try again.');
+        }
+
+        // Payment successful - create Firebase orders
+        // Group items by vendor
+        const vendorGroups = {};
+        cart.forEach(item => {
+          if (!vendorGroups[item.vendorId]) vendorGroups[item.vendorId] = [];
+          vendorGroups[item.vendorId].push(item);
+        });
+
+        // Create one order per vendor
+        const orderIds = [];
+        for (const [vendorId, items] of Object.entries(vendorGroups)) {
+          const vendorTotal = items.reduce((s,i) => s + (Number(i.price||0)*(i.qty||1)), 0);
+          const orderRef = await addDoc(collection(db, 'orders'), {
+            customerId:    currentUser.uid,
+            customerName:  currentUser.displayName || 'Customer',
+            vendorId,
+            items,
+            subtotal:      vendorTotal,
+            serviceFee:    SERVICE_FEE / Object.keys(vendorGroups).length,
+            totalAmount:   vendorTotal + (SERVICE_FEE / Object.keys(vendorGroups).length),
+            paymentMethod: selectedMethod,
+            paymentStatus: 'paid',
+            orderStatus:   'pending',
+            notes,
+            phone:         phone,
+            paynowReference: orderRef,
+            createdAt:     serverTimestamp(),
+            updatedAt:     serverTimestamp()
+          });
+          orderIds.push(orderRef.id);
+        }
+
+        // Clear cart
+        localStorage.setItem('ma_cart', '[]');
+        localStorage.setItem('ma_last_orders', JSON.stringify(orderIds));
+
+        // Show success
+        await showSuccess();
+
+        setTimeout(() => {
+          window.location.href = 'customer-payment-success.html';
+        }, 1800);
+
+      } catch (err) {
+        console.error('Payment error:', err);
+        hideModal();
+        btn.classList.remove('loading');
+        btn.disabled = false;
+        showToast(err.message || 'Payment failed. Please try again.', 'error');
+      }
+    };
+
+    // ── Modal animations ─────────────────────────────────────────
+    function showModal() {
+      document.getElementById('modalOverlay').classList.add('show');
+    }
+
+    function hideModal() {
+      document.getElementById('modalOverlay').classList.remove('show');
+    }
+
+    async function animateSteps() {
+      const steps  = ['mStep1','mStep2','mStep3','mStep4'];
+      const delays = [800, 1200, 1000, 800];
+
+      for (let i = 0; i < steps.length; i++) {
+        await new Promise(r => setTimeout(r, delays[i]));
+        document.getElementById(steps[i]).classList.remove('active');
+        document.getElementById(steps[i]).classList.add('done');
+        if (i + 1 < steps.length) {
+          document.getElementById(steps[i+1]).classList.add('active');
+        }
+      }
+    }
+
+    async function showSuccess() {
+      document.getElementById('modalSpinner').style.display = 'none';
+      document.getElementById('modalSteps').style.display   = 'none';
+      document.getElementById('modalIcon').textContent  = '✅';
+      document.getElementById('modalTitle').textContent = 'Payment Successful!';
+      document.getElementById('modalSub').textContent   = 'Your order has been placed. Redirecting...';
+      await new Promise(r => setTimeout(r, 1800));
+    }
+
+    // ── Helpers ──────────────────────────────────────────────────
+    function catEmoji(cat) {
+      const m = { Clothing:'👕', Shoes:'👟', Accessories:'👜', Bags:'🎒', Vintage:'🕶️', Wholesale:'📦', Kids:'🧒' };
+      return m[cat] || '🛍️';
+    }
+
+    window.showToast = function(msg, type = 'error') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.className = `toast ${type} show`;
+      setTimeout(() => t.classList.remove('show'), 3000);
+    };
+  </script>
+
+</body>
+</html>

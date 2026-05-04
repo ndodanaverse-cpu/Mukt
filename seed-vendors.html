@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Seed Sample Vendors</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232E7D32' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' dominant-baseline='middle'>🛍️</text></svg>" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #1f2937;
+      margin-bottom: 10px;
+    }
+    .desc {
+      color: #6b7280;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    .btn {
+      display: inline-block;
+      background: #2e7d32;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-right: 10px;
+    }
+    .btn:hover {
+      background: #1b5e20;
+      transform: translateY(-1px);
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .status {
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 8px;
+      display: none;
+      font-size: 14px;
+    }
+    .status.show { display: block; }
+    .status.success {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border-left: 4px solid #2e7d32;
+    }
+    .status.error {
+      background: #ffebee;
+      color: #ef5350;
+      border-left: 4px solid #ef5350;
+    }
+    .status.info {
+      background: #e3f2fd;
+      color: #1565c0;
+      border-left: 4px solid #1565c0;
+    }
+    .log {
+      margin-top: 10px;
+      max-height: 300px;
+      overflow-y: auto;
+      background: #fafafa;
+      padding: 10px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #374151;
+    }
+    .log-entry {
+      margin: 4px 0;
+      padding: 4px;
+    }
+    .log-entry.ok { color: #2e7d32; }
+    .log-entry.error { color: #ef5350; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌱 Seed Sample Vendors</h1>
+    <p class="desc">Click the button below to add 4 sample vendors with stock data to your Firestore database.</p>
+
+    <button class="btn" id="seedBtn" onclick="seedVendors()">Seed 4 Vendors</button>
+    <button class="btn" style="background:#9ca3af;" id="clearBtn" onclick="clearVendors()">Clear All Vendors</button>
+
+    <div class="status" id="status"></div>
+    <div class="log" id="log"></div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, deleteDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2vGB7iehqse--Th5wds1MoU4ZHr_DYY4",
+      authDomain: "mukoto-avenue-3758a.firebaseapp.com",
+      projectId: "mukoto-avenue-3758a",
+      storageBucket: "mukoto-avenue-3758a.firebasestorage.app",
+      messagingSenderId: "172793539743",
+      appId: "1:172793539743:web:46fae0bd5be1ecedebc6aa",
+      measurementId: "G-VN9T6FEVJ0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Sign in anonymously for testing
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        signInAnonymously(auth).catch(console.error);
+      }
+    });
+
+    const vendors = [
+      {
+        shopName: "Green Grocers Market",
+        category: "Wholesale",
+        description: "Fresh vegetables and fruits. Bulk orders welcome. Same-day delivery available.",
+        address: "123 Harare Central, Harare",
+        operatingHours: "6am – 6pm",
+        phone: "+263 77 123 4567",
+        isActive: true,
+        isVerified: true,
+        rating: 4.8,
+        reviewCount: 156,
+        totalSales: 2340,
+        profilePhoto: "",
+        bannerPhoto: ""
+      },
+      {
+        shopName: "Fashion Forward",
+        category: "Clothing",
+        description: "Latest trends in clothing. Original brands. We offer tailoring services.",
+        address: "45 Sam Nujoma Street, Harare",
+        operatingHours: "9am – 7pm",
+        phone: "+263 78 987 6543",
+        isActive: true,
+        isVerified: true,
+        rating: 4.6,
+        reviewCount: 98,
+        totalSales: 1204,
+        profilePhoto: "",
+        bannerPhoto: ""
+      },
+      {
+        shopName: "Tech Hub Solutions",
+        category: "Accessories",
+        description: "Electronics, phone accessories, and gadgets. Extended warranty available.",
+        address: "78 Enterprise Road, Harare",
+        operatingHours: "8am – 8pm",
+        phone: "+263 72 555 1234",
+        isActive: true,
+        isVerified: false,
+        rating: 4.4,
+        reviewCount: 67,
+        totalSales: 892,
+        profilePhoto: "",
+        bannerPhoto: ""
+      },
+      {
+        shopName: "Vintage Treasures",
+        category: "Vintage",
+        description: "Curated vintage collections. Authentic retro items. Collectors welcome.",
+        address: "12 Rotten Row, Harare",
+        operatingHours: "10am – 6pm",
+        phone: "+263 71 444 9876",
+        isActive: true,
+        isVerified: true,
+        rating: 4.9,
+        reviewCount: 143,
+        totalSales: 1876,
+        profilePhoto: "",
+        bannerPhoto: ""
+      }
+    ];
+
+    window.seedVendors = async function() {
+      const btn = document.getElementById('seedBtn');
+      const status = document.getElementById('status');
+      const log = document.getElementById('log');
+
+      btn.disabled = true;
+      status.className = 'status show info';
+      status.textContent = '🔄 Adding vendors...';
+      log.innerHTML = '';
+
+      try {
+        let added = 0;
+
+        for (const vendor of vendors) {
+          try {
+            // Generate a fake UID for demo
+            const fakeUid = `demo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+            const vendorData = {
+              ...vendor,
+              userId: fakeUid,
+              createdAt: serverTimestamp(),
+              updatedAt: serverTimestamp()
+            };
+
+            const docRef = await addDoc(collection(db, 'vendors'), vendorData);
+            added++;
+
+            log.innerHTML += `<div class="log-entry ok">✓ Added: ${vendor.shopName} (ID: ${docRef.id})</div>`;
+
+          } catch (e) {
+            log.innerHTML += `<div class="log-entry error">✗ Failed: ${vendor.shopName} - ${e.message}</div>`;
+          }
+        }
+
+        status.className = 'status show success';
+        status.textContent = `✅ Successfully added ${added}/${vendors.length} vendors!`;
+        btn.disabled = false;
+
+      } catch (err) {
+        console.error('Seed error:', err);
+        status.className = 'status show error';
+        status.textContent = `❌ Error: ${err.message}`;
+        btn.disabled = false;
+      }
+    };
+
+    window.clearVendors = async function() {
+      if (!confirm('This will delete ALL vendors from Firestore. Continue?')) return;
+
+      const btn = document.getElementById('clearBtn');
+      const status = document.getElementById('status');
+      const log = document.getElementById('log');
+
+      btn.disabled = true;
+      status.className = 'status show info';
+      status.textContent = '🔄 Clearing vendors...';
+      log.innerHTML = '';
+
+      try {
+        const snap = await getDocs(collection(db, 'vendors'));
+        let deleted = 0;
+
+        for (const doc of snap.docs) {
+          await deleteDoc(doc.ref);
+          deleted++;
+          log.innerHTML += `<div class="log-entry ok">✓ Deleted vendor (ID: ${doc.id})</div>`;
+        }
+
+        status.className = 'status show success';
+        status.textContent = `✅ Deleted ${deleted} vendor(s)`;
+        btn.disabled = false;
+
+      } catch (err) {
+        console.error('Clear error:', err);
+        status.className = 'status show error';
+        status.textContent = `❌ Error: ${err.message}`;
+        btn.disabled = false;
+      }
+    };
+  </script>
+</body>
+</html>

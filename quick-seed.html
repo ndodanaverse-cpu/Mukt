@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quick Seed 3 Vendors</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232E7D32' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' dominant-baseline='middle'>🛍️</text></svg>" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .container {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      text-align: center;
+      min-width: 300px;
+    }
+    h1 { color: #1f2937; margin-bottom: 10px; font-size: 24px; }
+    .spinner {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 4px solid #e5e7eb;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 20px 0;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .status { color: #6b7280; font-size: 16px; margin: 20px 0; }
+    .success { color: #2e7d32; font-weight: 600; }
+    .error { color: #ef5350; font-weight: 600; }
+    .vendor-list {
+      text-align: left;
+      margin-top: 20px;
+      background: #f9fafb;
+      padding: 15px;
+      border-radius: 8px;
+    }
+    .vendor-item {
+      padding: 8px;
+      margin: 4px 0;
+      background: white;
+      border-left: 3px solid #667eea;
+      border-radius: 4px;
+    }
+    .vendor-name { font-weight: 600; color: #1f2937; }
+    .vendor-desc { font-size: 12px; color: #6b7280; margin-top: 2px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 Auto-Seeding Vendors</h1>
+    <div class="spinner" id="spinner"></div>
+    <div class="status" id="status">Adding 3 vendors...</div>
+    <div class="vendor-list" id="vendors"></div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2vGB7iehqse--Th5wds1MoU4ZHr_DYY4",
+      authDomain: "mukoto-avenue-3758a.firebaseapp.com",
+      projectId: "mukoto-avenue-3758a",
+      storageBucket: "mukoto-avenue-3758a.firebasestorage.app",
+      messagingSenderId: "172793539743",
+      appId: "1:172793539743:web:46fae0bd5be1ecedebc6aa",
+      measurementId: "G-VN9T6FEVJ0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        await signInAnonymously(auth);
+      }
+    });
+
+    const vendors = [
+      {
+        shopName: "Fresh Produce Co.",
+        category: "Grocery",
+        description: "Farm-fresh vegetables and fruits delivered daily",
+        address: "Harare Central Market",
+        operatingHours: "6am – 7pm",
+        phone: "+263 77 111 2222",
+        isActive: true,
+        isVerified: true,
+        rating: 4.8,
+        reviewCount: 200,
+        totalSales: 3500
+      },
+      {
+        shopName: "Premium Fashions",
+        category: "Clothing",
+        description: "Designer wear and casual outfits for all occasions",
+        address: "Samora Machel Avenue, Harare",
+        operatingHours: "10am – 6pm",
+        phone: "+263 78 333 4444",
+        isActive: true,
+        isVerified: true,
+        rating: 4.7,
+        reviewCount: 150,
+        totalSales: 2100
+      },
+      {
+        shopName: "Electronics Plus",
+        category: "Accessories",
+        description: "Latest phones, laptops, and tech gadgets with warranty",
+        address: "The Pavilion, Harare",
+        operatingHours: "9am – 8pm",
+        phone: "+263 71 555 6666",
+        isActive: true,
+        isVerified: true,
+        rating: 4.6,
+        reviewCount: 180,
+        totalSales: 4200
+      }
+    ];
+
+    const vendorsList = document.getElementById('vendors');
+    const statusEl = document.getElementById('status');
+    const spinner = document.getElementById('spinner');
+
+    setTimeout(async () => {
+      try {
+        let count = 0;
+        for (const vendor of vendors) {
+          await addDoc(collection(db, 'vendors'), {
+            ...vendor,
+            userId: `demo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+          });
+          count++;
+          vendorsList.innerHTML += `<div class="vendor-item"><div class="vendor-name">✓ ${vendor.shopName}</div><div class="vendor-desc">${vendor.description}</div></div>`;
+        }
+        
+        spinner.style.display = 'none';
+        statusEl.className = 'status success';
+        statusEl.textContent = `✅ Successfully added ${count} vendors!`;
+        setTimeout(() => window.location.href = 'customer-home.html', 2000);
+      } catch (err) {
+        spinner.style.display = 'none';
+        statusEl.className = 'status error';
+        statusEl.textContent = `❌ Error: ${err.message}`;
+        console.error(err);
+      }
+    }, 800);
+  </script>
+</body>
+</html>

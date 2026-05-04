@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mukoto Avenue — Notifications</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232E7D32' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' dominant-baseline='middle'>🛍️</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      background: #FAFAFA;
+      font-family: 'Inter', sans-serif;
+      padding-bottom: 90px;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(160deg, #2E7D32 0%, #1B5E20 100%);
+      padding: 52px 20px 20px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-row {
+      display: flex; align-items: center;
+      justify-content: space-between;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .back-btn {
+      width: 38px; height: 38px;
+      background: rgba(255,255,255,0.15); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; cursor: pointer; border: none;
+      color: white; text-decoration: none; transition: all 0.2s;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.25); }
+    .header-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 20px; font-weight: 800; color: white;
+    }
+    .header-sub {
+      font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 1px;
+    }
+    .mark-all-btn {
+      font-size: 12px; font-weight: 700; color: #F9A825;
+      background: none; border: none; cursor: pointer;
+      padding: 6px 10px; border-radius: 8px;
+      transition: background 0.2s; white-space: nowrap;
+    }
+    .mark-all-btn:hover { background: rgba(249,168,37,0.15); }
+
+    /* ── Filter tabs ── */
+    .filter-tabs {
+      display: flex; gap: 6px;
+      overflow-x: auto; scrollbar-width: none;
+      padding: 14px 16px 0;
+    }
+    .filter-tabs::-webkit-scrollbar { display: none; }
+    .filter-tab {
+      padding: 7px 14px; border-radius: 999px;
+      font-size: 12px; font-weight: 700;
+      white-space: nowrap; cursor: pointer;
+      border: 1.5px solid #E5E7EB;
+      background: white; color: #374151;
+      transition: all 0.2s; flex-shrink: 0;
+    }
+    .filter-tab.active {
+      background: #2E7D32; border-color: #2E7D32;
+      color: white; box-shadow: 0 3px 10px rgba(46,125,50,0.25);
+    }
+
+    /* ── Notification groups ── */
+    .notif-group { margin: 14px 16px 0; }
+    .group-label {
+      font-size: 11px; font-weight: 700; color: #9CA3AF;
+      text-transform: uppercase; letter-spacing: 0.8px;
+      margin-bottom: 8px; padding: 0 2px;
+    }
+
+    /* Notification card */
+    .notif-card {
+      background: white; border-radius: 16px;
+      padding: 14px 16px;
+      display: flex; align-items: flex-start; gap: 12px;
+      margin-bottom: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      cursor: pointer; transition: all 0.2s;
+      position: relative; overflow: hidden;
+      animation: slideIn 0.3s ease both;
+    }
+    .notif-card:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+    .notif-card.unread { background: #FAFFF8; }
+    .notif-card.unread::before {
+      content: ''; position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px; background: #2E7D32;
+      border-radius: 999px 0 0 999px;
+    }
+
+    @keyframes slideIn {
+      from { opacity:0; transform:translateY(8px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* Icon */
+    .notif-icon {
+      width: 44px; height: 44px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .icon-order    { background: #e8f5e9; }
+    .icon-message  { background: #e3f2fd; }
+    .icon-review   { background: #fffde7; }
+    .icon-promo    { background: #fce4ec; }
+    .icon-system   { background: #F3F4F6; }
+    .icon-payment  { background: #e8f5e9; }
+    .icon-listing  { background: #ede7f6; }
+
+    /* Content */
+    .notif-content { flex: 1; min-width: 0; }
+    .notif-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px; font-weight: 700; color: #1A1A1A;
+      margin-bottom: 3px; line-height: 1.4;
+    }
+    .notif-body {
+      font-size: 12px; color: #6B7280;
+      line-height: 1.5; margin-bottom: 6px;
+      display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .notif-time { font-size: 11px; color: #9CA3AF; font-weight: 500; }
+
+    /* Right side */
+    .notif-right {
+      display: flex; flex-direction: column;
+      align-items: flex-end; gap: 6px; flex-shrink: 0;
+    }
+    .unread-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #2E7D32;
+    }
+    .notif-amount {
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px; font-weight: 800; color: #2E7D32;
+    }
+    .notif-action-btn {
+      padding: 5px 10px; border-radius: 8px;
+      font-size: 11px; font-weight: 700;
+      border: 1.5px solid #E5E7EB; background: white;
+      color: #374151; cursor: pointer; transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .notif-action-btn:hover { border-color: #2E7D32; color: #2E7D32; }
+    .notif-action-btn.primary {
+      background: #2E7D32; border-color: #2E7D32; color: white;
+    }
+
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center; padding: 60px 20px; display: none;
+    }
+    .empty-state.show { display: block; }
+    .empty-emoji { font-size: 56px; margin-bottom: 14px; }
+    .empty-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 18px; font-weight: 800; color: #1A1A1A; margin-bottom: 8px;
+    }
+    .empty-desc { font-size: 14px; color: #9CA3AF; line-height: 1.6; }
+
+    /* ── Skeleton ── */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite; border-radius: 16px;
+    }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+    /* ── Bottom nav ── */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: white; border-top: 1px solid #F3F4F6;
+      display: flex; padding: 10px 0 20px; z-index: 200;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+    }
+    .nav-item {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; gap: 3px;
+      cursor: pointer; text-decoration: none; padding: 4px 0;
+    }
+    .nav-icon { font-size: 22px; }
+    .nav-label { font-size: 10px; font-weight: 600; color: #9CA3AF; }
+    .nav-item.active .nav-label { color: #2E7D32; }
+    .nav-dot { width: 4px; height: 4px; background: #2E7D32; border-radius: 50%; display: none; }
+    .nav-item.active .nav-dot { display: block; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 90px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      padding: 12px 20px; border-radius: 12px;
+      font-size: 13px; font-weight: 600; color: white;
+      opacity: 0; transition: all 0.3s; z-index: 1000;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      max-width: 90vw; text-align: center;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { background: #2E7D32; }
+    .toast.info    { background: #1565C0; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-row">
+      <div class="header-left">
+        <a href="javascript:history.back()" class="back-btn">←</a>
+        <div>
+          <div class="header-title">Notifications</div>
+          <div class="header-sub" id="notifSubText">Loading...</div>
+        </div>
+      </div>
+      <button class="mark-all-btn" onclick="markAllRead()">Mark all read</button>
+    </div>
+  </div>
+
+  <!-- Filter tabs -->
+  <div class="filter-tabs">
+    <div class="filter-tab active" id="tab-all"     onclick="switchTab('all',this)">All</div>
+    <div class="filter-tab"        id="tab-orders"  onclick="switchTab('orders',this)">📦 Orders</div>
+    <div class="filter-tab"        id="tab-messages" onclick="switchTab('messages',this)">💬 Messages</div>
+    <div class="filter-tab"        id="tab-payments" onclick="switchTab('payments',this)">💰 Payments</div>
+    <div class="filter-tab"        id="tab-promos"  onclick="switchTab('promos',this)">🎉 Promos</div>
+  </div>
+
+  <!-- Notification groups -->
+  <div id="notifsContainer">
+    <!-- Skeletons -->
+    <div class="notif-group">
+      <div class="group-label">Today</div>
+      <div class="skeleton" style="height:80px;margin-bottom:8px;"></div>
+      <div class="skeleton" style="height:80px;margin-bottom:8px;"></div>
+      <div class="skeleton" style="height:80px;"></div>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty-state" id="emptyState">
+    <div class="empty-emoji">🔔</div>
+    <div class="empty-title">All caught up!</div>
+    <div class="empty-desc">No notifications in this category yet. We'll let you know when something important happens.</div>
+  </div>
+
+  <!-- Bottom nav (role-aware) -->
+  <nav class="bottom-nav" id="bottomNav"></nav>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getFirestore, collection, query, where,
+      orderBy, getDocs, doc, getDoc,
+      updateDoc, writeBatch, serverTimestamp,
+      onSnapshot, addDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2vGB7iehqse--Th5wds1MoU4ZHr_DYY4",
+      authDomain: "mukoto-avenue-3758a.firebaseapp.com",
+      projectId: "mukoto-avenue-3758a",
+      storageBucket: "mukoto-avenue-3758a.firebasestorage.app",
+      messagingSenderId: "172793539743",
+      appId: "1:172793539743:web:46fae0bd5be1ecedebc6aa",
+      measurementId: "G-VN9T6FEVJ0"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    let currentUser  = null;
+    let userRole     = 'customer';
+    let allNotifs    = [];
+    let activeTab    = 'all';
+
+    // ── Auth guard ───────────────────────────────────────────────
+    onAuthStateChanged(auth, async user => {
+      if (!user) { window.location.href = 'login.html'; return; }
+      currentUser = user;
+
+      const snap = await getDoc(doc(db, 'users', user.uid));
+      if (snap.exists()) userRole = snap.data().role || 'customer';
+
+      renderBottomNav();
+      subscribeToNotifications();
+    });
+
+    // ── Subscribe to notifications ───────────────────────────────
+    function subscribeToNotifications() {
+      try {
+        const q = query(
+          collection(db, 'notifications'),
+          where('userId', '==', currentUser.uid),
+          orderBy('createdAt', 'desc')
+        );
+
+        onSnapshot(q, snap => {
+          allNotifs = [];
+          snap.forEach(d => allNotifs.push({ id: d.id, ...d.data() }));
+          if (!allNotifs.length) seedDemoNotifications();
+          else renderNotifications(allNotifs);
+          updateSubText();
+        }, err => {
+          console.error('Notif snapshot error:', err);
+          seedDemoNotifications();
+        });
+      } catch (err) {
+        seedDemoNotifications();
+      }
+    }
+
+    // ── Seed demo notifications if none exist ────────────────────
+    async function seedDemoNotifications() {
+      const now   = new Date();
+      const demos = [
+        {
+          userId: currentUser.uid, type: 'order', isRead: false,
+          title: userRole === 'vendor' ? '🛒 New Order Received!' : '✅ Order Confirmed!',
+          body: userRole === 'vendor'
+            ? 'Tinashe Moyo placed an order for Vintage Levi\'s Jacket · $12.00'
+            : 'Your order #MKT-091A has been confirmed by Tafadzwa\'s Threads',
+          amount: '$12.00', action: userRole === 'vendor' ? 'vendor-orders.html' : 'customer-orders.html',
+          actionLabel: 'View Order',
+          createdAt: { toDate: () => new Date(now.getTime() - 35 * 60000) }
+        },
+        {
+          userId: currentUser.uid, type: 'message', isRead: false,
+          title: '💬 New Message',
+          body: userRole === 'vendor'
+            ? 'Rudo Chikwanda: "Is the Chitenge Bomber Jacket still available?"'
+            : 'Tafadzwa\'s Threads: "Yes it is! Just got 2 left in stock 😊"',
+          action: 'shared-chat-list.html', actionLabel: 'Reply',
+          createdAt: { toDate: () => new Date(now.getTime() - 42 * 60000) }
+        },
+        {
+          userId: currentUser.uid, type: 'review', isRead: true,
+          title: '⭐ New 5-Star Review!',
+          body: 'Tinashe Moyo left you a 5-star review: "Fast response and great quality!"',
+          action: userRole === 'vendor' ? 'vendor-profile.html' : 'customer-profile.html',
+          actionLabel: 'View',
+          createdAt: { toDate: () => new Date(now.getTime() - 2 * 3600000) }
+        },
+        {
+          userId: currentUser.uid, type: 'payment', isRead: true,
+          title: '💰 Payment Received',
+          body: 'You received $19.50 via EcoCash for Order #MKT-091A',
+          amount: '$19.50', action: userRole === 'vendor' ? 'vendor-earnings.html' : 'customer-orders.html',
+          actionLabel: 'View Earnings',
+          createdAt: { toDate: () => new Date(now.getTime() - 5 * 3600000) }
+        },
+        {
+          userId: currentUser.uid, type: 'system', isRead: true,
+          title: '🎉 Welcome to Mukoto Avenue!',
+          body: 'Your account is set up and ready. Start exploring vendors near you in Harare.',
+          action: userRole === 'vendor' ? 'vendor-dashboard.html' : 'customer-home.html',
+          actionLabel: 'Get Started',
+          createdAt: { toDate: () => new Date(now.getTime() - 3 * 86400000) }
+        }
+      ];
+
+      if (userRole === 'vendor') {
+        demos.splice(2, 0, {
+          userId: currentUser.uid, type: 'order', isRead: true,
+          title: '📦 Order Fulfilled',
+          body: 'Order #MKT-089F for Farai Dube has been marked as fulfilled',
+          action: 'vendor-orders.html', actionLabel: 'View Orders',
+          createdAt: { toDate: () => new Date(now.getTime() - 86400000) }
+        });
+      } else {
+        demos.splice(2, 0, {
+          userId: currentUser.uid, type: 'promo', isRead: true,
+          title: '🏷️ Flash Sale Alert!',
+          body: 'Harare Vintage Hub is offering 20% off all vintage items today only!',
+          action: 'customer-search.html', actionLabel: 'Shop Now',
+          createdAt: { toDate: () => new Date(now.getTime() - 86400000) }
+        });
+      }
+
+      allNotifs = demos;
+      renderNotifications(allNotifs);
+      updateSubText();
+    }
+
+    // ── Render notifications ─────────────────────────────────────
+    function renderNotifications(notifs) {
+      const container = document.getElementById('notifsContainer');
+      const empty     = document.getElementById('emptyState');
+
+      // Filter by tab
+      let filtered = notifs;
+      if (activeTab === 'orders')   filtered = notifs.filter(n => n.type === 'order');
+      if (activeTab === 'messages') filtered = notifs.filter(n => n.type === 'message');
+      if (activeTab === 'payments') filtered = notifs.filter(n => n.type === 'payment');
+      if (activeTab === 'promos')   filtered = notifs.filter(n => ['promo','review','system'].includes(n.type));
+
+      if (!filtered.length) {
+        container.innerHTML = '';
+        empty.classList.add('show');
+        return;
+      }
+      empty.classList.remove('show');
+
+      // Group by time
+      const groups = { today:[], yesterday:[], older:[] };
+      const now    = new Date();
+      const todayStr     = now.toDateString();
+      const yesterdayStr = new Date(now.getTime() - 86400000).toDateString();
+
+      filtered.forEach(n => {
+        const d = n.createdAt?.toDate?.() || new Date();
+        const ds = d.toDateString();
+        if (ds === todayStr) groups.today.push(n);
+        else if (ds === yesterdayStr) groups.yesterday.push(n);
+        else groups.older.push(n);
+      });
+
+      let html = '';
+      if (groups.today.length) {
+        html += `<div class="notif-group">
+          <div class="group-label">Today</div>
+          ${groups.today.map((n,i) => renderCard(n,i)).join('')}
+        </div>`;
+      }
+      if (groups.yesterday.length) {
+        html += `<div class="notif-group">
+          <div class="group-label">Yesterday</div>
+          ${groups.yesterday.map((n,i) => renderCard(n,i)).join('')}
+        </div>`;
+      }
+      if (groups.older.length) {
+        html += `<div class="notif-group">
+          <div class="group-label">Earlier</div>
+          ${groups.older.map((n,i) => renderCard(n,i)).join('')}
+        </div>`;
+      }
+
+      container.innerHTML = html;
+    }
+
+    function renderCard(n, i) {
+      const d       = n.createdAt?.toDate?.() || new Date();
+      const timeStr = timeAgo(d);
+      const icon    = getIcon(n.type);
+      const iconClass = getIconClass(n.type);
+
+      return `
+        <div class="notif-card ${n.isRead ? '' : 'unread'}"
+          style="animation-delay:${i*0.05}s"
+          onclick="handleNotifClick('${n.id}','${n.action||''}')">
+          <div class="notif-icon ${iconClass}">${icon}</div>
+          <div class="notif-content">
+            <div class="notif-title">${n.title||''}</div>
+            <div class="notif-body">${n.body||''}</div>
+            <div class="notif-time">${timeStr}</div>
+          </div>
+          <div class="notif-right">
+            ${!n.isRead ? '<div class="unread-dot"></div>' : ''}
+            ${n.amount ? `<div class="notif-amount">${n.amount}</div>` : ''}
+            ${n.actionLabel ? `
+              <button class="notif-action-btn ${n.type==='order'&&!n.isRead?'primary':''}"
+                onclick="event.stopPropagation();handleNotifClick('${n.id}','${n.action||''}')">
+                ${n.actionLabel}
+              </button>` : ''}
+          </div>
+        </div>`;
+    }
+
+    // ── Handle notification click ────────────────────────────────
+    window.handleNotifClick = async function(notifId, action) {
+      // Mark as read
+      const idx = allNotifs.findIndex(n => n.id === notifId);
+      if (idx !== -1) {
+        allNotifs[idx].isRead = true;
+        renderNotifications(allNotifs);
+        updateSubText();
+
+        // Update Firestore if real doc
+        try {
+          await updateDoc(doc(db, 'notifications', notifId), { isRead: true });
+        } catch (_) {}
+      }
+
+      // Navigate
+      if (action && action !== 'undefined') {
+        setTimeout(() => window.location.href = action, 200);
+      }
+    };
+
+    // ── Mark all read ────────────────────────────────────────────
+    window.markAllRead = async function() {
+      allNotifs.forEach(n => n.isRead = true);
+      renderNotifications(allNotifs);
+      updateSubText();
+      showToast('All notifications marked as read ✅', 'success');
+
+      // Update Firestore batch
+      try {
+        const batch = writeBatch(db);
+        allNotifs.forEach(n => {
+          if (n.id && n.id.length > 10) {
+            batch.update(doc(db, 'notifications', n.id), { isRead: true });
+          }
+        });
+        await batch.commit();
+      } catch (_) {}
+    };
+
+    // ── Tab switch ───────────────────────────────────────────────
+    window.switchTab = function(tab, el) {
+      activeTab = tab;
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      renderNotifications(allNotifs);
+    };
+
+    // ── Update sub text ──────────────────────────────────────────
+    function updateSubText() {
+      const unread = allNotifs.filter(n => !n.isRead).length;
+      document.getElementById('notifSubText').textContent =
+        unread > 0
+          ? `${unread} unread notification${unread!==1?'s':''}`
+          : 'All caught up!';
+    }
+
+    // ── Bottom nav ───────────────────────────────────────────────
+    function renderBottomNav() {
+      const nav = document.getElementById('bottomNav');
+      if (userRole === 'vendor') {
+        nav.innerHTML = `
+          <a href="vendor-dashboard.html" class="nav-item">
+            <div class="nav-icon">🏠</div><div class="nav-label">Dashboard</div><div class="nav-dot"></div>
+          </a>
+          <a href="vendor-listings.html" class="nav-item">
+            <div class="nav-icon">📋</div><div class="nav-label">Listings</div><div class="nav-dot"></div>
+          </a>
+          <a href="vendor-orders.html" class="nav-item">
+            <div class="nav-icon">📦</div><div class="nav-label">Orders</div><div class="nav-dot"></div>
+          </a>
+          <a href="vendor-earnings.html" class="nav-item">
+            <div class="nav-icon">📈</div><div class="nav-label">Earnings</div><div class="nav-dot"></div>
+          </a>
+          <a href="vendor-profile.html" class="nav-item">
+            <div class="nav-icon">👤</div><div class="nav-label">Profile</div><div class="nav-dot"></div>
+          </a>`;
+      } else {
+        nav.innerHTML = `
+          <a href="customer-home.html" class="nav-item">
+            <div class="nav-icon">🏠</div><div class="nav-label">Home</div><div class="nav-dot"></div>
+          </a>
+          <a href="customer-map.html" class="nav-item">
+            <div class="nav-icon">🗺️</div><div class="nav-label">Map</div><div class="nav-dot"></div>
+          </a>
+          <a href="customer-orders.html" class="nav-item">
+            <div class="nav-icon">📦</div><div class="nav-label">Orders</div><div class="nav-dot"></div>
+          </a>
+          <a href="shared-chat-list.html" class="nav-item">
+            <div class="nav-icon">💬</div><div class="nav-label">Messages</div><div class="nav-dot"></div>
+          </a>
+          <a href="customer-profile.html" class="nav-item">
+            <div class="nav-icon">👤</div><div class="nav-label">Profile</div><div class="nav-dot"></div>
+          </a>`;
+      }
+    }
+
+    // ── Helpers ──────────────────────────────────────────────────
+    function getIcon(type) {
+      const m = { order:'📦', message:'💬', review:'⭐', promo:'🎉', system:'🔔', payment:'💰', listing:'📋' };
+      return m[type] || '🔔';
+    }
+    function getIconClass(type) {
+      const m = { order:'icon-order', message:'icon-message', review:'icon-review',
+                  promo:'icon-promo', system:'icon-system', payment:'icon-payment', listing:'icon-listing' };
+      return m[type] || 'icon-system';
+    }
+    function timeAgo(date) {
+      const diff = Math.floor((Date.now() - date) / 1000);
+      if (diff < 60)    return 'Just now';
+      if (diff < 3600)  return `${Math.floor(diff/60)} min ago`;
+      if (diff < 86400) return `${Math.floor(diff/3600)} hr ago`;
+      if (diff < 604800) return `${Math.floor(diff/86400)} day${Math.floor(diff/86400)!==1?'s':''} ago`;
+      return date.toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+    }
+    window.showToast = function(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.className = `toast ${type} show`;
+      setTimeout(() => t.classList.remove('show'), 2500);
+    };
+  </script>
+
+</body>
+</html>

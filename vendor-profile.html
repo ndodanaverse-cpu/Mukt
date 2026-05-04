@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vendor Profile | Muk</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232E7D32' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' dominant-baseline='middle'>🛍️</text></svg>" />
+  <style>
+    body { margin:0; font-family:Inter,system-ui,sans-serif; background:#F5F5F7; color:#1f2937; }
+    .header{padding:20px 16px 16px; background:#FFFFFF; box-shadow:0 1px 2px rgba(0,0,0,.08);}
+    .header-row{display:flex;align-items:center;justify-content:space-between;}
+    .header-left{display:flex;align-items:center;gap:10px;}
+    .vendor-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#e2f3e7;color:#2e7d32;font-weight:900;text-decoration:none;}
+    .header-text{line-height:1.1;}
+    .greeting{font-size:12px;color:#6b7280;}
+    .vendor-name-text{font-size:18px;font-weight:700;}
+    .icon-btn{font-size:20px;text-decoration:none;color:#374151;}
+    .body{padding:12px 16px 84px;}
+    .section-title{margin-bottom:10px;font-size:14px;font-weight:700;color:#374151;}
+    .profile-card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 10px 15px rgba(0,0,0,.06);margin-bottom:12px;}
+    .profile-row{display:flex;justify-content:space-between;align-items:center;margin:8px 0;}
+    .field-title{font-size:13px;color:#6b7280;}
+    .field-value{font-size:16px;font-weight:700;color:#111827;}
+    .btn-primary{display:inline-block;background:#2e7d32;color:#fff;padding:10px 16px;border-radius:10px;text-decoration:none;font-weight:700;margin-top:10px;}
+    .bottom-nav{position:fixed;bottom:0;left:0;width:100%;display:flex;background:#fff;border-top:1px solid #e5e7eb;box-shadow:0 -1px 6px rgba(0,0,0,.08);}
+    .nav-item{flex:1;padding:8px 0;text-align:center;text-decoration:none;color:#9ca3af;font-size:12px;font-weight:600;}
+    .nav-item.active{color:#2e7d32;}
+    .nav-icon{font-size:20px;display:block;}
+    .nav-dot{margin-top:4px;width:6px;height:6px;border-radius:999px;background:#2e7d32;margin-left:auto;margin-right:auto;display:none;}
+    .nav-item.active .nav-dot{display:block;}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-row">
+      <div class="header-left">
+        <a href="vendor-profile.html" class="vendor-avatar">?</a>
+        <div class="header-text">
+          <div class="greeting">Welcome Back</div>
+          <div class="vendor-name-text">Vendor Profile</div>
+        </div>
+      </div>
+      <div>
+        <a href="shared-notifications.html" class="icon-btn">🔔</a>
+        <a href="shared-chat-list.html" class="icon-btn" style="margin-left:12px;">💬</a>
+      </div>
+    </div>
+  </div>
+  <div class="body">
+    <div class="section-title">About you</div>
+    <div class="profile-card">
+      <div class="profile-row"><div class="field-title">Name</div><div class="field-value" id="vendorName">Loading...</div></div>
+      <div class="profile-row"><div class="field-title">Store</div><div class="field-value" id="shopName">Loading...</div></div>
+      <div class="profile-row"><div class="field-title">Email</div><div class="field-value" id="vendorEmail">Loading...</div></div>
+      <div class="profile-row"><div class="field-title">Phone</div><div class="field-value" id="vendorPhone">Loading...</div></div>
+      <a href="vendor-dashboard.html" class="btn-primary">Edit Profile</a>
+    </div>
+    <div class="section-title">Account actions</div>
+    <div class="profile-card">
+      <a href="vendor-earnings.html" class="btn-primary" style="background:#2563eb;">View Earnings</a>
+      <a href="vendor-orders.html" class="btn-primary" style="background:#f59e0b; margin-top:8px;">View Orders</a>
+      <button onclick="handleLogout()" class="btn-primary" style="background:#ef5350; margin-top:8px; width:100%; border:none; cursor:pointer;">Log Out</button>
+    </div>
+  </div>
+  <nav class="bottom-nav">
+    <a href="vendor-dashboard.html" class="nav-item">
+      <span class="nav-icon">🏠</span>Dashboard
+      <span class="nav-dot"></span>
+    </a>
+    <a href="vendor-listings.html" class="nav-item">
+      <span class="nav-icon">📋</span>Listings
+      <span class="nav-dot"></span>
+    </a>
+    <a href="vendor-orders.html" class="nav-item">
+      <span class="nav-icon">📦</span>Orders
+      <span class="nav-dot"></span>
+    </a>
+    <a href="vendor-earnings.html" class="nav-item">
+      <span class="nav-icon">📈</span>Earnings
+      <span class="nav-dot"></span>
+    </a>
+    <a href="vendor-profile.html" class="nav-item active">
+      <span class="nav-icon">👤</span>Profile
+      <span class="nav-dot"></span>
+    </a>
+  </nav>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2vGB7iehqse--Th5wds1MoU4ZHr_DYY4",
+      authDomain: "mukoto-avenue-3758a.firebaseapp.com",
+      projectId: "mukoto-avenue-3758a",
+      storageBucket: "mukoto-avenue-3758a.firebasestorage.app",
+      messagingSenderId: "172793539743",
+      appId: "1:172793539743:web:46fae0bd5be1ecedebc6aa",
+      measurementId: "G-VN9T6FEVJ0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    function setText(id, value) {
+      document.getElementById(id).textContent = value || 'N/A';
+    }
+
+    onAuthStateChanged(auth, async user => {
+      if (!user) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (!userDoc.exists() || userDoc.data().role !== 'vendor') {
+        window.location.href = 'customer-home.html';
+        return;
+      }
+
+      const vendorDoc = await getDoc(doc(db, 'vendors', user.uid));
+      const data = vendorDoc.exists() ? vendorDoc.data() : {};
+
+      setText('vendorName', data.name || user.displayName || 'Unknown Vendor');
+      setText('shopName', data.shopName || 'Your Shop');
+      setText('vendorEmail', data.email || user.email || 'No email');
+      setText('vendorPhone', data.phone || 'No phone number');
+
+      const avatar = document.querySelector('.vendor-avatar');
+      if (avatar && data.name) {
+        avatar.textContent = data.name.charAt(0).toUpperCase();
+      }
+    });
+
+    window.handleLogout = async function() {
+      if (!confirm('Are you sure you want to log out?')) return;
+      try {
+        await signOut(auth);
+        localStorage.clear();
+        window.location.href = 'login.html';
+      } catch (err) {
+        console.error('Logout error:', err);
+        alert('Error logging out. Please try again.');
+      }
+    };
+  </script>
+</body>
+</html>

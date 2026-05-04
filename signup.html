@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mukoto Avenue — Sign Up</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232E7D32' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' dominant-baseline='middle'>🛍️</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      background: #FAFAFA;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(160deg, #2E7D32 0%, #1B5E20 100%);
+      padding: 52px 28px 40px;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      background: rgba(249,168,37,0.12);
+      top: -70px; right: -50px;
+    }
+    .header::after {
+      content: '';
+      position: absolute;
+      width: 140px; height: 140px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      bottom: -40px; left: 30px;
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 2;
+      text-decoration: none;
+    }
+    .header-logo-icon {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, #F9A825, #F57F17);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .header-logo-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 20px; font-weight: 800; color: white;
+    }
+    .header-logo-name span { color: #F9A825; }
+
+    .header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 28px; font-weight: 800;
+      color: white; line-height: 1.2;
+      position: relative; z-index: 2;
+      margin-bottom: 6px;
+    }
+    .header p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+      position: relative; z-index: 2;
+    }
+
+    /* ── Body ── */
+    .body {
+      flex: 1;
+      padding: 28px 24px 48px;
+      max-width: 480px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* ── Role selector ── */
+    .section-label {
+      font-family: 'Poppins', sans-serif;
+      font-size: 12px; font-weight: 700;
+      color: #374151;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .role-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .role-card {
+      border: 2px solid #E5E7EB;
+      border-radius: 16px;
+      padding: 20px 14px;
+      cursor: pointer;
+      transition: all 0.25s;
+      background: white;
+      text-align: center;
+      position: relative;
+      user-select: none;
+    }
+    .role-card:hover {
+      border-color: #86EFAC;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(46,125,50,0.1);
+    }
+    .role-card.selected {
+      border-color: #2E7D32;
+      background: linear-gradient(135deg, #f0faf0, #e8f5e9);
+      box-shadow: 0 4px 20px rgba(46,125,50,0.18);
+      transform: translateY(-2px);
+    }
+    .role-check {
+      position: absolute; top: 10px; right: 10px;
+      width: 22px; height: 22px;
+      background: #2E7D32;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 11px; font-weight: 700;
+      opacity: 0;
+      transform: scale(0.4);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .role-card.selected .role-check {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .role-icon { font-size: 34px; margin-bottom: 10px; }
+    .role-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px; font-weight: 700;
+      color: #1A1A1A; margin-bottom: 4px;
+    }
+    .role-desc { font-size: 12px; color: #6B7280; line-height: 1.5; }
+
+    /* ── Divider ── */
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 22px;
+    }
+    .divider-line { flex: 1; height: 1px; background: #E5E7EB; }
+    .divider-text { font-size: 12px; color: #9CA3AF; font-weight: 500; white-space: nowrap; }
+
+    /* ── Form fields ── */
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .field { margin-bottom: 16px; }
+    .field-label {
+      display: block;
+      font-size: 12px; font-weight: 600;
+      color: #374151;
+      margin-bottom: 7px;
+      letter-spacing: 0.3px;
+    }
+    .field-wrap { position: relative; }
+    .field-icon {
+      position: absolute;
+      left: 14px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 15px;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .field-input {
+      width: 100%;
+      padding: 13px 14px 13px 42px;
+      border: 1.5px solid #E5E7EB;
+      border-radius: 12px;
+      font-size: 14px;
+      color: #1A1A1A;
+      background: white;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+      outline: none;
+      
+    }
+    .field-input:focus {
+      border-color: #2E7D32;
+      box-shadow: 0 0 0 3px rgba(46,125,50,0.1);
+    }
+    .field-input.error {
+      border-color: #EF5350;
+      box-shadow: 0 0 0 3px rgba(239,83,80,0.1);
+    }
+    .field-input::placeholder { color: #9CA3AF; }
+    .field-error {
+      font-size: 11px;
+      color: #EF5350;
+      margin-top: 5px;
+      display: none;
+    }
+    .field-error.show { display: block; }
+
+    /* Password toggle */
+    .pwd-toggle {
+      position: absolute;
+      right: 14px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      cursor: pointer; font-size: 16px;
+      padding: 0; color: #9CA3AF;
+      transition: color 0.2s;
+    }
+    .pwd-toggle:hover { color: #374151; }
+
+    /* Password strength */
+    .strength-wrap {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .strength-bars {
+      display: flex; gap: 4px; flex: 1;
+    }
+    .strength-bar {
+      flex: 1; height: 3px;
+      border-radius: 999px;
+      background: #E5E7EB;
+      transition: background 0.3s;
+    }
+    .strength-bar.weak { background: #EF5350; }
+    .strength-bar.fair { background: #FF9800; }
+    .strength-bar.good { background: #4CAF50; }
+    .strength-bar.strong { background: #2E7D32; }
+    .strength-text {
+      font-size: 11px; font-weight: 600;
+      color: #9CA3AF;
+      min-width: 44px;
+      transition: color 0.3s;
+    }
+
+    /* Terms */
+    .terms {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+    .terms-checkbox {
+      width: 18px; height: 18px;
+      margin-top: 1px;
+      accent-color: #2E7D32;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .terms-text {
+      font-size: 12px;
+      color: #6B7280;
+      line-height: 1.6;
+    }
+    .terms-text a {
+      color: #2E7D32;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      width: 100%;
+      padding: 16px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, #2E7D32, #1B5E20);
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px; font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 6px 20px rgba(46,125,50,0.35);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      letter-spacing: 0.3px;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(46,125,50,0.45);
+    }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Loading spinner inside button */
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    .btn-primary.loading .spinner { display: block; }
+    .btn-primary.loading .btn-text { display: none; }
+
+    .btn-google {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1.5px solid #E5E7EB;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px; font-weight: 600;
+      color: #374151;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 20px;
+    }
+    .btn-google:hover {
+      border-color: #D1D5DB;
+      background: #F9FAFB;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .social-divider {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 16px;
+    }
+    .social-line { flex: 1; height: 1px; background: #E5E7EB; }
+    .social-text { font-size: 12px; color: #9CA3AF; }
+
+    .login-link {
+      text-align: center;
+      font-size: 13px;
+      color: #6B7280;
+    }
+    .login-link a {
+      color: #2E7D32;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .login-link a:hover { text-decoration: underline; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      padding: 13px 22px;
+      border-radius: 12px;
+      font-size: 13px; font-weight: 600;
+      color: white;
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 1000;
+      white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      max-width: 90vw;
+      text-align: center;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .toast.success { background: #2E7D32; }
+    .toast.error { background: #EF5350; }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <a href="index.html" class="header-logo">
+      <div class="header-logo-icon">🛍️</div>
+      <div class="header-logo-name">Mukoto<span>Avenue</span></div>
+    </a>
+    <h1>Create your<br/>account</h1>
+    <p>Join Zimbabwe's fastest growing street market</p>
+  </div>
+
+  <!-- Body -->
+  <div class="body">
+
+    <!-- Role -->
+    <div class="section-label">I want to</div>
+    <div class="role-cards">
+      <div class="role-card" id="roleCustomer" onclick="selectRole('customer')">
+        <div class="role-check">✓</div>
+        <div class="role-icon">🛒</div>
+        <div class="role-name">Shop</div>
+        <div class="role-desc">Browse & buy from vendors near me</div>
+      </div>
+      <div class="role-card selected" id="roleVendor" onclick="selectRole('vendor')">
+        <div class="role-check">✓</div>
+        <div class="role-icon">🏪</div>
+        <div class="role-name">Sell</div>
+        <div class="role-desc">List my products & grow my business</div>
+      </div>
+    </div>
+
+    <div class="divider">
+      <div class="divider-line"></div>
+      <div class="divider-text">Fill in your details</div>
+      <div class="divider-line"></div>
+    </div>
+
+    <!-- Name row -->
+    <div class="field-row">
+      <div>
+        <label class="field-label">First Name</label>
+        <div class="field-wrap">
+          <span class="field-icon">👤</span>
+          <input class="field-input" id="firstName" type="text" placeholder="First name" autocomplete="given-name"/>
+        </div>
+        <div class="field-error" id="firstNameErr">Enter your first name</div>
+      </div>
+      <div>
+        <label class="field-label">Last Name</label>
+        <div class="field-wrap">
+          <span class="field-icon">👤</span>
+          <input class="field-input" id="lastName" type="text" placeholder="Last name" autocomplete="family-name"/>
+        </div>
+        <div class="field-error" id="lastNameErr">Enter your last name</div>
+      </div>
+    </div>
+
+    <!-- Phone -->
+    <div class="field">
+      <label class="field-label">Phone Number</label>
+      <div class="field-wrap">
+        <span class="field-icon">📞</span>
+        <input class="field-input" id="phone" type="tel" placeholder="+263 77 123 4567" autocomplete="tel"/>
+      </div>
+      <div class="field-error" id="phoneErr">Enter a valid phone number</div>
+    </div>
+
+    <!-- Email -->
+    <div class="field">
+      <label class="field-label">Email Address</label>
+      <div class="field-wrap">
+        <span class="field-icon">✉️</span>
+        <input class="field-input" id="email" type="email" placeholder="you@email.com" autocomplete="email"/>
+      </div>
+      <div class="field-error" id="emailErr">Enter a valid email address</div>
+    </div>
+
+    <!-- Password -->
+    <div class="field">
+      <label class="field-label">Password</label>
+      <div class="field-wrap">
+        <span class="field-icon">🔒</span>
+        <input class="field-input" id="password" type="password" placeholder="Min. 8 characters" autocomplete="new-password" oninput="checkStrength(this.value)"/>
+        <button class="pwd-toggle" type="button" onclick="togglePwd('password', this)">👁</button>
+      </div>
+      <div class="strength-wrap">
+        <div class="strength-bars">
+          <div class="strength-bar" id="sb1"></div>
+          <div class="strength-bar" id="sb2"></div>
+          <div class="strength-bar" id="sb3"></div>
+          <div class="strength-bar" id="sb4"></div>
+        </div>
+        <div class="strength-text" id="strengthText"></div>
+      </div>
+      <div class="field-error" id="passwordErr">Password must be at least 8 characters</div>
+    </div>
+
+    <!-- Confirm Password -->
+    <div class="field">
+      <label class="field-label">Confirm Password</label>
+      <div class="field-wrap">
+        <span class="field-icon">🔒</span>
+        <input class="field-input" id="confirmPassword" type="password" placeholder="Repeat your password" autocomplete="new-password"/>
+        <button class="pwd-toggle" type="button" onclick="togglePwd('confirmPassword', this)">👁</button>
+      </div>
+      <div class="field-error" id="confirmErr">Passwords do not match</div>
+    </div>
+
+    <!-- Terms -->
+    <div class="terms">
+      <input class="terms-checkbox" type="checkbox" id="termsCheck" checked/>
+      <div class="terms-text">
+        I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I understand my data helps connect me with local vendors in Zimbabwe.
+      </div>
+    </div>
+
+    <!-- Create Account -->
+    <button class="btn-primary" id="signupBtn" onclick="handleSignup()">
+      <div class="spinner"></div>
+      <span class="btn-text">Create My Account →</span>
+    </button>
+
+    <!-- Divider -->
+    <div class="social-divider">
+      <div class="social-line"></div>
+      <div class="social-text">or sign up with</div>
+      <div class="social-line"></div>
+    </div>
+
+    <!-- Google -->
+    <button class="btn-google" onclick="handleGoogle()">
+      <svg width="18" height="18" viewBox="0 0 48 48">
+        <path fill="#FFC107" d="M43.6 20H24v8h11.3C33.7 33.7 29.3 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6-6C34.6 5.1 29.6 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21c10.5 0 20-7.6 20-21 0-1.3-.2-2.7-.4-4z"/>
+        <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6-6C34.6 5.1 29.6 3 24 3 16.3 3 9.7 7.9 6.3 14.7z"/>
+        <path fill="#4CAF50" d="M24 45c5.5 0 10.4-1.9 14.2-5.1l-6.6-5.4C29.7 36.3 27 37 24 37c-5.2 0-9.6-3.2-11.3-7.8l-6.6 5.1C9.7 40.9 16.4 45 24 45z"/>
+        <path fill="#1976D2" d="M43.6 20H24v8h11.3c-.9 2.6-2.6 4.8-4.9 6.3l6.6 5.4C41 36.2 44 30.6 44 24c0-1.3-.2-2.7-.4-4z"/>
+      </svg>
+      Continue with Google
+    </button>
+
+    <!-- Login link -->
+    <div class="login-link">
+      Already have an account? <a href="login.html">Log In</a>
+    </div>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2vGB7iehqse--Th5wds1MoU4ZHr_DYY4",
+      authDomain: "mukoto-avenue-3758a.firebaseapp.com",
+      projectId: "mukoto-avenue-3758a",
+      storageBucket: "mukoto-avenue-3758a.firebasestorage.app",
+      messagingSenderId: "172793539743",
+      appId: "1:172793539743:web:46fae0bd5be1ecedebc6aa",
+      measurementId: "G-VN9T6FEVJ0"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    // ── Expose functions to global scope ─────────────────────────
+    window.handleSignup = async function () {
+      if (!validate()) return;
+
+      const btn = document.getElementById('signupBtn');
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName  = document.getElementById('lastName').value.trim();
+      const phone     = document.getElementById('phone').value.trim();
+      const email     = document.getElementById('email').value.trim();
+      const password  = document.getElementById('password').value;
+      const role      = window._selectedRole || 'vendor';
+
+      try {
+        // 1. Create auth user
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        const user = cred.user;
+
+        // 2. Update display name
+        await updateProfile(user, { displayName: `${firstName} ${lastName}` });
+
+        // 3. Write user doc to Firestore
+        await setDoc(doc(db, 'users', user.uid), {
+          uid: user.uid,
+          firstName,
+          lastName,
+          displayName: `${firstName} ${lastName}`,
+          phone,
+          email,
+          role,
+          createdAt: serverTimestamp(),
+          isVerified: false,
+          profilePhoto: ''
+        });
+
+        // 4. If vendor — create vendor doc too
+        if (role === 'vendor') {
+          await setDoc(doc(db, 'vendors', user.uid), {
+            userId: user.uid,
+            shopName: `${firstName}'s Shop`,
+            description: '',
+            location: null,
+            address: '',
+            operatingHours: '8am - 5pm',
+            rating: 0,
+            totalSales: 0,
+            isActive: true,
+            badges: [],
+            createdAt: serverTimestamp()
+          });
+        }
+
+        showToast('Account created! Welcome to Mukoto Avenue 🎉', 'success');
+
+        // 5. Redirect based on role
+        setTimeout(() => {
+          if (role === 'vendor') {
+            window.location.href = 'vendor-dashboard.html';
+          } else {
+            window.location.href = 'customer-home.html';
+          }
+        }, 1500);
+
+      } catch (err) {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+        let msg = 'Something went wrong. Please try again.';
+        if (err.code === 'auth/email-already-in-use') msg = 'This email is already registered. Try logging in.';
+        if (err.code === 'auth/invalid-email') msg = 'Please enter a valid email address.';
+        if (err.code === 'auth/weak-password') msg = 'Password is too weak. Use at least 8 characters.';
+        if (err.code === 'auth/network-request-failed') msg = 'No internet connection. Please check your network.';
+        showToast(msg, 'error');
+      }
+    };
+
+    window.handleGoogle = async function () {
+      const provider = new GoogleAuthProvider();
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        const role = window._selectedRole || 'customer';
+
+        // Write to Firestore if new user
+        const nameParts = (user.displayName || '').split(' ');
+        await setDoc(doc(db, 'users', user.uid), {
+          uid: user.uid,
+          firstName: nameParts[0] || '',
+          lastName: nameParts.slice(1).join(' ') || '',
+          displayName: user.displayName || '',
+          phone: user.phoneNumber || '',
+          email: user.email,
+          role,
+          createdAt: serverTimestamp(),
+          isVerified: true,
+          profilePhoto: user.photoURL || ''
+        }, { merge: true });
+
+        if (role === 'vendor') {
+          await setDoc(doc(db, 'vendors', user.uid), {
+            userId: user.uid,
+            shopName: `${nameParts[0]}'s Shop`,
+            description: '',
+            location: null,
+            address: '',
+            operatingHours: '8am - 5pm',
+            rating: 0,
+            totalSales: 0,
+            isActive: true,
+            badges: [],
+            createdAt: serverTimestamp()
+          }, { merge: true });
+        }
+
+        showToast('Welcome to Mukoto Avenue! 🎉', 'success');
+        setTimeout(() => {
+          window.location.href = role === 'vendor' ? 'vendor-dashboard.html' : 'customer-home.html';
+        }, 1200);
+
+      } catch (err) {
+        let msg = 'Google sign-in failed. Please try again.';
+        if (err.code === 'auth/popup-closed-by-user') msg = 'Sign-in cancelled.';
+        showToast(msg, 'error');
+      }
+    };
+  </script>
+
+  <script>
+    // ── Role selection ───────────────────────────────────────────
+    window._selectedRole = 'vendor';
+
+    window.selectRole = function(role) {
+      window._selectedRole = role;
+      document.getElementById('roleCustomer').classList.toggle('selected', role === 'customer');
+      document.getElementById('roleVendor').classList.toggle('selected', role === 'vendor');
+    };
+
+    // ── Password visibility ──────────────────────────────────────
+    window.togglePwd = function(inputId, btn) {
+      const input = document.getElementById(inputId);
+      const isText = input.type === 'text';
+      input.type = isText ? 'password' : 'text';
+      btn.textContent = isText ? '👁' : '🙈';
+    };
+
+    // ── Password strength ────────────────────────────────────────
+    window.checkStrength = function(val) {
+      let score = 0;
+      if (val.length >= 8) score++;
+      if (val.length >= 12) score++;
+      if (/[A-Z]/.test(val) && /[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+
+      const levels = ['', 'weak', 'fair', 'good', 'strong'];
+      const labels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+      const colors = ['', '#EF5350', '#FF9800', '#4CAF50', '#2E7D32'];
+
+      for (let i = 1; i <= 4; i++) {
+        const bar = document.getElementById('sb' + i);
+        bar.className = 'strength-bar';
+        if (i <= score) bar.classList.add(levels[score]);
+      }
+
+      const txt = document.getElementById('strengthText');
+      txt.textContent = val.length ? labels[score] : '';
+      txt.style.color = colors[score];
+    };
+
+    // ── Validation ───────────────────────────────────────────────
+    window.validate = function() {
+      let valid = true;
+
+      const fields = [
+        { id: 'firstName',       errId: 'firstNameErr',    check: v => v.trim().length > 0,       msg: 'Enter your first name' },
+        { id: 'lastName',        errId: 'lastNameErr',     check: v => v.trim().length > 0,       msg: 'Enter your last name' },
+        { id: 'phone',           errId: 'phoneErr',        check: v => v.trim().length >= 9,      msg: 'Enter a valid phone number' },
+        { id: 'email',           errId: 'emailErr',        check: v => /\S+@\S+\.\S+/.test(v),   msg: 'Enter a valid email address' },
+        { id: 'password',        errId: 'passwordErr',     check: v => v.length >= 8,             msg: 'Password must be at least 8 characters' },
+        { id: 'confirmPassword', errId: 'confirmErr',      check: v => v === document.getElementById('password').value, msg: 'Passwords do not match' },
+      ];
+
+      fields.forEach(f => {
+        const input = document.getElementById(f.id);
+        const err   = document.getElementById(f.errId);
+        const ok    = f.check(input.value);
+        input.classList.toggle('error', !ok);
+        err.textContent = f.msg;
+        err.classList.toggle('show', !ok);
+        if (!ok) valid = false;
+      });
+
+      if (!document.getElementById('termsCheck').checked) {
+        showToast('Please agree to the Terms of Service to continue.', 'error');
+        valid = false;
+      }
+
+      return valid;
+    };
+
+    // ── Toast ────────────────────────────────────────────────────
+    window.showToast = function(msg, type = 'error') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = `toast ${type} show`;
+      setTimeout(() => t.classList.remove('show'), 3500);
+    };
+
+    // Clear errors on input
+    document.querySelectorAll('.field-input').forEach(input => {
+      input.addEventListener('input', () => {
+        input.classList.remove('error');
+        const errEl = document.getElementById(input.id + 'Err');
+        if (errEl) errEl.classList.remove('show');
+      });
+    });
+  </script>
+
+</body>
+</html>

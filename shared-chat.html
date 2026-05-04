@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mukoto Avenue — Chat</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232E7D32' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' dominant-baseline='middle'>🛍️</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      height: 100vh;
+      background: #FAFAFA;
+      font-family: 'Inter', sans-serif;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(160deg, #2E7D32 0%, #1B5E20 100%);
+      padding: 52px 16px 14px;
+      flex-shrink: 0; z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+    .header-row {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .back-btn {
+      width: 38px; height: 38px;
+      background: rgba(255,255,255,0.15); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; cursor: pointer; border: none;
+      color: white; text-decoration: none; transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.25); }
+
+    .other-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: linear-gradient(135deg, #F9A825, #F57F17);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; color: white;
+      font-family: 'Poppins', sans-serif;
+      flex-shrink: 0; overflow: hidden;
+      border: 2px solid rgba(255,255,255,0.3);
+      position: relative; cursor: pointer;
+    }
+    .other-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-online-dot {
+      position: absolute; bottom: 1px; right: 1px;
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #4CAF50; border: 2px solid #1B5E20;
+    }
+
+    .header-info { flex: 1; min-width: 0; }
+    .other-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 16px; font-weight: 800; color: white;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .other-status {
+      font-size: 11px; color: rgba(255,255,255,0.7);
+      margin-top: 1px; display: flex; align-items: center; gap: 4px;
+    }
+    .status-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #4CAF50;
+    }
+
+    .header-actions { display: flex; gap: 8px; }
+    .header-action-btn {
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,0.15); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; cursor: pointer; border: none;
+      color: white; transition: all 0.2s;
+    }
+    .header-action-btn:hover { background: rgba(255,255,255,0.25); }
+
+    /* ── Messages area ── */
+    .messages-area {
+      flex: 1; overflow-y: auto;
+      padding: 16px 14px;
+      display: flex; flex-direction: column; gap: 4px;
+      scrollbar-width: thin;
+      scrollbar-color: #E5E7EB transparent;
+      background: #F5F5F5;
+    }
+    .messages-area::-webkit-scrollbar { width: 4px; }
+    .messages-area::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 999px; }
+
+    /* Date divider */
+    .date-divider {
+      text-align: center; margin: 10px 0 6px;
+      position: relative;
+    }
+    .date-divider::before {
+      content: ''; position: absolute;
+      top: 50%; left: 0; right: 0;
+      height: 1px; background: #E5E7EB;
+    }
+    .date-divider span {
+      background: #F5F5F5; padding: 0 12px;
+      font-size: 11px; color: #9CA3AF; font-weight: 600;
+      position: relative; z-index: 1;
+    }
+
+    /* Message bubble */
+    .msg-row {
+      display: flex; align-items: flex-end; gap: 8px;
+      margin-bottom: 2px;
+      animation: msgIn 0.25s ease;
+    }
+    .msg-row.sent { flex-direction: row-reverse; }
+
+    @keyframes msgIn {
+      from { opacity:0; transform:translateY(8px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .msg-avatar-sm {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: linear-gradient(135deg, #2E7D32, #1B5E20);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: white;
+      flex-shrink: 0; overflow: hidden;
+    }
+    .msg-avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
+    .msg-row.sent .msg-avatar-sm { display: none; }
+
+    .msg-bubble {
+      max-width: 72%; padding: 10px 14px;
+      border-radius: 18px; position: relative;
+      word-break: break-word; line-height: 1.55;
+    }
+    .msg-bubble.received {
+      background: white;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      color: #1A1A1A;
+    }
+    .msg-bubble.sent {
+      background: linear-gradient(135deg, #2E7D32, #1B5E20);
+      border-bottom-right-radius: 4px;
+      color: white;
+      box-shadow: 0 2px 8px rgba(46,125,50,0.3);
+    }
+
+    .msg-text { font-size: 14px; }
+    .msg-time {
+      font-size: 10px; margin-top: 4px;
+      display: block; text-align: right;
+    }
+    .msg-bubble.received .msg-time { color: #9CA3AF; }
+    .msg-bubble.sent .msg-time { color: rgba(255,255,255,0.6); }
+
+    /* Read receipt */
+    .msg-receipt {
+      font-size: 11px; color: rgba(255,255,255,0.7);
+      margin-top: 2px; text-align: right;
+    }
+
+    /* Image message */
+    .msg-image {
+      max-width: 72%; border-radius: 14px;
+      overflow: hidden; cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+    }
+    .msg-image img { width: 100%; max-height: 220px; object-fit: cover; display: block; }
+
+    /* Product card in chat */
+    .msg-product-card {
+      max-width: 240px;
+      background: white; border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      cursor: pointer; transition: all 0.2s;
+      text-decoration: none; display: block;
+    }
+    .msg-product-card:hover { transform: translateY(-2px); }
+    .msg-product-img {
+      width: 100%; height: 120px;
+      background: #F3F4F6;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 40px; overflow: hidden; position: relative;
+    }
+    .msg-product-img img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+    .msg-product-info { padding: 10px 12px; }
+    .msg-product-name { font-size: 13px; font-weight: 700; color: #1A1A1A; margin-bottom: 2px; }
+    .msg-product-price { font-size: 14px; font-weight: 800; color: #2E7D32; }
+
+    /* Typing indicator */
+    .typing-indicator {
+      display: none; align-items: center; gap: 8px;
+      padding: 4px 0;
+    }
+    .typing-indicator.show { display: flex; }
+    .typing-dots {
+      background: white; border-radius: 18px;
+      padding: 10px 14px;
+      display: flex; gap: 4px; align-items: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .typing-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #9CA3AF;
+      animation: typingBounce 1.2s infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingBounce {
+      0%,60%,100% { transform:translateY(0); }
+      30%         { transform:translateY(-6px); }
+    }
+
+    /* ── Input bar ── */
+    .input-bar {
+      background: white; padding: 12px 14px 28px;
+      border-top: 1px solid #F3F4F6;
+      display: flex; align-items: flex-end; gap: 10px;
+      flex-shrink: 0; z-index: 100;
+      box-shadow: 0 -2px 12px rgba(0,0,0,0.05);
+    }
+
+    .attach-btn {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: #F3F4F6; border: none;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; cursor: pointer; flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .attach-btn:hover { background: #E5E7EB; }
+
+    .input-wrap {
+      flex: 1; position: relative;
+      background: #F9FAFB; border-radius: 22px;
+      border: 1.5px solid #E5E7EB;
+      display: flex; align-items: flex-end;
+      transition: border-color 0.2s;
+    }
+    .input-wrap:focus-within { border-color: #2E7D32; background: white; }
+
+    .msg-input {
+      flex: 1; padding: 10px 14px;
+      background: transparent; border: none; outline: none;
+      font-size: 14px; font-family: 'Inter', sans-serif;
+      color: #1A1A1A; resize: none;
+      max-height: 100px; overflow-y: auto;
+      line-height: 1.5; scrollbar-width: none;
+    }
+    .msg-input::-webkit-scrollbar { display: none; }
+    .msg-input::placeholder { color: #9CA3AF; }
+
+    .emoji-btn {
+      padding: 10px 10px 10px 0;
+      background: none; border: none;
+      font-size: 18px; cursor: pointer;
+      opacity: 0.6; transition: opacity 0.2s;
+    }
+    .emoji-btn:hover { opacity: 1; }
+
+    .send-btn {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: linear-gradient(135deg, #2E7D32, #1B5E20);
+      border: none; display: flex; align-items: center;
+      justify-content: center; font-size: 18px;
+      cursor: pointer; flex-shrink: 0; transition: all 0.2s;
+      box-shadow: 0 3px 10px rgba(46,125,50,0.35);
+    }
+    .send-btn:hover { transform: scale(1.08); }
+    .send-btn:active { transform: scale(0.95); }
+    .send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* Quick replies */
+    .quick-replies {
+      display: flex; gap: 8px;
+      overflow-x: auto; scrollbar-width: none;
+      padding: 8px 14px 0;
+      background: white;
+    }
+    .quick-replies::-webkit-scrollbar { display: none; }
+    .quick-reply {
+      padding: 6px 14px; border-radius: 999px;
+      border: 1.5px solid #E5E7EB; background: white;
+      font-size: 12px; font-weight: 600; color: #374151;
+      white-space: nowrap; cursor: pointer; flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .quick-reply:hover { border-color: #2E7D32; color: #2E7D32; }
+
+    /* ── Empty chat ── */
+    .empty-chat {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 32px; text-align: center;
+    }
+    .empty-chat-emoji { font-size: 52px; margin-bottom: 14px; }
+    .empty-chat-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 16px; font-weight: 800; color: #1A1A1A; margin-bottom: 6px;
+    }
+    .empty-chat-desc { font-size: 13px; color: #9CA3AF; line-height: 1.6; }
+
+    /* ── File input ── */
+    .file-input { display: none; }
+
+    /* ── Image preview in input ── */
+    .img-preview-bar {
+      background: white; padding: 8px 14px 0;
+      display: none;
+    }
+    .img-preview-bar.show { display: flex; gap: 8px; }
+    .img-preview-item {
+      width: 56px; height: 56px; border-radius: 10px;
+      overflow: hidden; position: relative;
+    }
+    .img-preview-item img { width: 100%; height: 100%; object-fit: cover; }
+    .img-preview-remove {
+      position: absolute; top: 2px; right: 2px;
+      width: 18px; height: 18px;
+      background: rgba(0,0,0,0.6); border-radius: 50%;
+      border: none; color: white; font-size: 10px;
+      cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-row">
+      <a href="shared-chat-list.html" class="back-btn">←</a>
+      <div class="other-avatar" id="otherAvatar">?</div>
+      <div class="header-info">
+        <div class="other-name" id="otherName">Loading...</div>
+        <div class="other-status" id="otherStatus">
+          <div class="status-dot"></div>
+          <span>Online</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="header-action-btn" onclick="callUser()" title="Call">📞</button>
+        <button class="header-action-btn" onclick="viewProfile()" title="Profile">👤</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick replies -->
+  <div class="quick-replies" id="quickReplies">
+    <div class="quick-reply" onclick="sendQuickReply('👋 Hi there!')">👋 Hi there!</div>
+    <div class="quick-reply" onclick="sendQuickReply('Is this still available?')">Still available?</div>
+    <div class="quick-reply" onclick="sendQuickReply('What sizes do you have?')">What sizes?</div>
+    <div class="quick-reply" onclick="sendQuickReply('Can I pick up today?')">Pickup today?</div>
+    <div class="quick-reply" onclick="sendQuickReply('What is your best price?')">Best price?</div>
+    <div class="quick-reply" onclick="sendQuickReply('Thank you! 🙏')">Thank you!</div>
+  </div>
+
+  <!-- Image preview bar -->
+  <div class="img-preview-bar" id="imgPreviewBar"></div>
+
+  <!-- Messages area -->
+  <div class="messages-area" id="messagesArea">
+    <div class="empty-chat" id="emptyChat">
+      <div class="empty-chat-emoji">💬</div>
+      <div class="empty-chat-title">Start the conversation</div>
+      <div class="empty-chat-desc">Say hello or ask about a product.<br/>Messages are private between you and the vendor.</div>
+    </div>
+  </div>
+
+  <!-- Typing indicator -->
+  <div class="typing-indicator" id="typingIndicator" style="padding:0 14px 8px;background:#F5F5F5;">
+    <div class="msg-avatar-sm" id="typingAvatar">?</div>
+    <div class="typing-dots">
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    </div>
+  </div>
+
+  <!-- Input bar -->
+  <div class="input-bar">
+    <button class="attach-btn" onclick="triggerFileUpload()">📎</button>
+    <div class="input-wrap">
+      <textarea class="msg-input" id="msgInput"
+        placeholder="Type a message..."
+        rows="1"
+        onkeydown="handleKeyDown(event)"
+        oninput="handleInput(this)"></textarea>
+      <button class="emoji-btn" onclick="toggleEmoji()">😊</button>
+    </div>
+    <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+  </div>
+
+  <input type="file" class="file-input" id="fileInput"
+    accept="image/*" onchange="handleFileSelect(event)"/>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getFirestore, collection, query, orderBy,
+      onSnapshot, addDoc, doc, getDoc, setDoc,
+      updateDoc, serverTimestamp, getDocs, limit
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import {
+      getStorage, ref, uploadBytes, getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2vGB7iehqse--Th5wds1MoU4ZHr_DYY4",
+      authDomain: "mukoto-avenue-3758a.firebaseapp.com",
+      projectId: "mukoto-avenue-3758a",
+      storageBucket: "mukoto-avenue-3758a.firebasestorage.app",
+      messagingSenderId: "172793539743",
+      appId: "1:172793539743:web:46fae0bd5be1ecedebc6aa",
+      measurementId: "G-VN9T6FEVJ0"
+    };
+
+    const app     = initializeApp(firebaseConfig);
+    const auth    = getAuth(app);
+    const db      = getFirestore(app);
+    const storage = getStorage(app);
+
+    const params   = new URLSearchParams(window.location.search);
+    let chatId     = params.get('chatId');
+    let otherId    = params.get('otherId') || params.get('vendorId') || params.get('customerId');
+    let currentUser = null;
+    let otherUser   = null;
+    let unsubscribe = null;
+    let pendingImages = [];
+    let typingTimeout = null;
+
+    // ── Auth guard ───────────────────────────────────────────────
+    onAuthStateChanged(auth, async user => {
+      if (!user) { window.location.href = 'login.html'; return; }
+      currentUser = user;
+
+      // Get other user info
+      if (otherId) {
+        try {
+          const uSnap = await getDoc(doc(db, 'users', otherId));
+          if (uSnap.exists()) {
+            otherUser = uSnap.data();
+          }
+          // Try vendor doc for shop name
+          const vSnap = await getDoc(doc(db, 'vendors', otherId));
+          if (vSnap.exists() && vSnap.data().shopName) {
+            otherUser = { ...otherUser, displayName: vSnap.data().shopName, ...vSnap.data() };
+          }
+        } catch (e) { console.error(e); }
+      }
+
+      // Check localStorage for context
+      const chatContext = JSON.parse(localStorage.getItem('ma_chat_vendor') ||
+                          localStorage.getItem('ma_chat_customer') || 'null');
+      if (!otherId && chatContext) otherId = chatContext.id || chatContext.userId;
+
+      setupHeader();
+      await ensureChatDoc();
+      subscribeToMessages();
+      markMessagesRead();
+    });
+
+    // ── Setup header ─────────────────────────────────────────────
+    function setupHeader() {
+      const name = otherUser?.shopName || otherUser?.displayName ||
+                   `${otherUser?.firstName||''} ${otherUser?.lastName||''}`.trim() || 'Chat';
+      document.getElementById('otherName').textContent = name;
+      document.title = `${name} — Mukoto Avenue`;
+
+      const avatarEl = document.getElementById('otherAvatar');
+      if (otherUser?.profilePhoto || otherUser?.photoURL) {
+        avatarEl.innerHTML = `<img src="${otherUser.profilePhoto||otherUser.photoURL}" onerror="this.style.display='none'">
+          <span>${name.substring(0,2).toUpperCase()}</span>`;
+      } else {
+        avatarEl.textContent = name.substring(0,2).toUpperCase();
+      }
+
+      // Typing avatar
+      document.getElementById('typingAvatar').textContent = name.substring(0,2).toUpperCase();
+    }
+
+    // ── Ensure chat document exists ──────────────────────────────
+    async function ensureChatDoc() {
+      if (chatId) return;
+      if (!otherId) return;
+
+      // Look for existing chat between these two users
+      try {
+        const q    = query(collection(db, 'chats'));
+        const snap = await getDocs(q);
+        snap.forEach(d => {
+          const data = d.data();
+          if (data.participantIds?.includes(currentUser.uid) &&
+              data.participantIds?.includes(otherId)) {
+            chatId = d.id;
+          }
+        });
+      } catch (e) { console.error(e); }
+
+      if (!chatId) {
+        // Create new chat
+        const myName    = currentUser.displayName || 'User';
+        const otherName = otherUser?.shopName || otherUser?.displayName ||
+                          `${otherUser?.firstName||''} ${otherUser?.lastName||''}`.trim() || 'User';
+        const myPhoto   = currentUser.photoURL || '';
+        const otherPhoto = otherUser?.profilePhoto || otherUser?.photoURL || '';
+
+        try {
+          const chatRef = await addDoc(collection(db, 'chats'), {
+            participantIds:    [currentUser.uid, otherId],
+            participantNames:  { [currentUser.uid]: myName, [otherId]: otherName },
+            participantPhotos: { [currentUser.uid]: myPhoto, [otherId]: otherPhoto },
+            lastMessage:       '',
+            lastMessageTime:   serverTimestamp(),
+            unreadCounts:      { [currentUser.uid]: 0, [otherId]: 0 },
+            createdAt:         serverTimestamp()
+          });
+          chatId = chatRef.id;
+        } catch (e) { console.error('Chat create error:', e); }
+      }
+
+      // Update URL
+      if (chatId) {
+        const url = new URL(window.location);
+        url.searchParams.set('chatId', chatId);
+        window.history.replaceState({}, '', url);
+      }
+    }
+
+    // ── Subscribe to messages ────────────────────────────────────
+    function subscribeToMessages() {
+      if (!chatId) return;
+      if (unsubscribe) unsubscribe();
+
+      const q = query(
+        collection(db, 'chats', chatId, 'messages'),
+        orderBy('createdAt', 'asc')
+      );
+
+      unsubscribe = onSnapshot(q, snap => {
+        const messages = [];
+        snap.forEach(d => messages.push({ id: d.id, ...d.data() }));
+        renderMessages(messages);
+      }, err => {
+        console.error('Messages snapshot error:', err);
+      });
+    }
+
+    // ── Render messages ──────────────────────────────────────────
+    function renderMessages(messages) {
+      const area      = document.getElementById('messagesArea');
+      const emptyChat = document.getElementById('emptyChat');
+      const wasAtBottom = area.scrollHeight - area.clientHeight <= area.scrollTop + 60;
+
+      if (!messages.length) {
+        emptyChat.style.display = 'flex';
+        area.innerHTML = '';
+        area.appendChild(emptyChat);
+        return;
+      }
+      emptyChat.style.display = 'none';
+
+      let lastDate = '';
+      let html     = '';
+
+      messages.forEach(msg => {
+        const isSent    = msg.senderId === currentUser.uid;
+        const time      = msg.createdAt?.toDate
+          ? msg.createdAt.toDate().toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' })
+          : '';
+        const dateStr   = msg.createdAt?.toDate
+          ? msg.createdAt.toDate().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' })
+          : '';
+        const otherInitials = (otherUser?.shopName || otherUser?.displayName || 'U').substring(0,2).toUpperCase();
+        const otherPhoto    = otherUser?.profilePhoto || otherUser?.photoURL || '';
+
+        if (dateStr && dateStr !== lastDate) {
+          html     += `<div class="date-divider"><span>${dateStr}</span></div>`;
+          lastDate  = dateStr;
+        }
+
+        if (msg.type === 'image' && msg.imageUrl) {
+          html += `
+            <div class="msg-row ${isSent ? 'sent' : ''}">
+              ${!isSent ? `<div class="msg-avatar-sm">
+                ${otherPhoto ? `<img src="${otherPhoto}" onerror="this.style.display='none'">` : ''}
+                <span>${otherInitials}</span>
+              </div>` : ''}
+              <div class="msg-image" onclick="viewImage('${msg.imageUrl}')">
+                <img src="${msg.imageUrl}" alt="Image"/>
+              </div>
+            </div>`;
+        } else {
+          html += `
+            <div class="msg-row ${isSent ? 'sent' : ''}">
+              ${!isSent ? `<div class="msg-avatar-sm">
+                ${otherPhoto ? `<img src="${otherPhoto}" onerror="this.style.display='none'">` : ''}
+                <span>${otherInitials}</span>
+              </div>` : ''}
+              <div class="msg-bubble ${isSent ? 'sent' : 'received'}">
+                <div class="msg-text">${escapeHtml(msg.text || '')}</div>
+                <span class="msg-time">${time}</span>
+                ${isSent ? `<div class="msg-receipt">${msg.read ? '✓✓' : '✓'}</div>` : ''}
+              </div>
+            </div>`;
+        }
+      });
+
+      area.innerHTML = html;
+
+      // Auto scroll to bottom
+      if (wasAtBottom || messages[messages.length-1]?.senderId === currentUser.uid) {
+        area.scrollTop = area.scrollHeight;
+      }
+
+      // Hide quick replies after first message
+      if (messages.length > 0) {
+        document.getElementById('quickReplies').style.display = 'none';
+      }
+    }
+
+    // ── Send message ─────────────────────────────────────────────
+    window.sendMessage = async function() {
+      if (!chatId) return;
+
+      const input = document.getElementById('msgInput');
+      const text  = input.value.trim();
+
+      // Send pending images first
+      if (pendingImages.length) {
+        for (const file of pendingImages) {
+          await sendImageMessage(file);
+        }
+        pendingImages = [];
+        document.getElementById('imgPreviewBar').classList.remove('show');
+        document.getElementById('imgPreviewBar').innerHTML = '';
+      }
+
+      if (!text) return;
+
+      input.value = '';
+      input.style.height = 'auto';
+      document.getElementById('sendBtn').disabled = true;
+
+      try {
+        const msgRef = await addDoc(collection(db, 'chats', chatId, 'messages'), {
+          text,
+          senderId:  currentUser.uid,
+          senderName: currentUser.displayName || 'User',
+          type:      'text',
+          read:      false,
+          createdAt: serverTimestamp()
+        });
+
+        // Update chat metadata
+        await updateDoc(doc(db, 'chats', chatId), {
+          lastMessage:     text,
+          lastMessageTime: serverTimestamp(),
+          [`unreadCounts.${otherId}`]: (await getUnreadCount()) + 1
+        });
+
+      } catch (err) {
+        console.error('Send message error:', err);
+      } finally {
+        document.getElementById('sendBtn').disabled = false;
+        input.focus();
+      }
+    };
+
+    async function sendImageMessage(file) {
+      try {
+        const storageRef = ref(storage, `chats/${chatId}/${Date.now()}_${file.name}`);
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+
+        await addDoc(collection(db, 'chats', chatId, 'messages'), {
+          text:      '📷 Image',
+          imageUrl:  url,
+          senderId:  currentUser.uid,
+          type:      'image',
+          read:      false,
+          createdAt: serverTimestamp()
+        });
+
+        await updateDoc(doc(db, 'chats', chatId), {
+          lastMessage:     '📷 Image',
+          lastMessageTime: serverTimestamp()
+        });
+      } catch (err) {
+        console.error('Image send error:', err);
+      }
+    }
+
+    async function getUnreadCount() {
+      try {
+        const snap = await getDoc(doc(db, 'chats', chatId));
+        return snap.data()?.unreadCounts?.[otherId] || 0;
+      } catch { return 0; }
+    }
+
+    // ── Mark messages as read ────────────────────────────────────
+    async function markMessagesRead() {
+      if (!chatId) return;
+      try {
+        await updateDoc(doc(db, 'chats', chatId), {
+          [`unreadCounts.${currentUser.uid}`]: 0
+        });
+      } catch (e) { console.error(e); }
+    }
+
+    // ── Quick reply ──────────────────────────────────────────────
+    window.sendQuickReply = function(text) {
+      document.getElementById('msgInput').value = text;
+      sendMessage();
+    };
+
+    // ── Handle keyboard ──────────────────────────────────────────
+    window.handleKeyDown = function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    };
+
+    // ── Auto-resize textarea ─────────────────────────────────────
+    window.handleInput = function(el) {
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+    };
+
+    // ── File upload ──────────────────────────────────────────────
+    window.triggerFileUpload = function() {
+      document.getElementById('fileInput').click();
+    };
+
+    window.handleFileSelect = function(e) {
+      const files = Array.from(e.target.files);
+      files.forEach(file => {
+        if (file.size > 5 * 1024 * 1024) return;
+        pendingImages.push(file);
+        const url  = URL.createObjectURL(file);
+        const bar  = document.getElementById('imgPreviewBar');
+        bar.classList.add('show');
+        const item = document.createElement('div');
+        item.className = 'img-preview-item';
+        item.innerHTML = `
+          <img src="${url}"/>
+          <button class="img-preview-remove" onclick="removePreviewImg(this, '${url}')">✕</button>`;
+        bar.appendChild(item);
+      });
+      e.target.value = '';
+    };
+
+    window.removePreviewImg = function(btn, url) {
+      const idx = pendingImages.findIndex(f => URL.createObjectURL(f) === url);
+      if (idx !== -1) pendingImages.splice(idx, 1);
+      btn.parentElement.remove();
+      if (pendingImages.length === 0) {
+        document.getElementById('imgPreviewBar').classList.remove('show');
+      }
+    };
+
+    // ── View full image ──────────────────────────────────────────
+    window.viewImage = function(url) {
+      window.open(url, '_blank');
+    };
+
+    // ── View profile ─────────────────────────────────────────────
+    window.viewProfile = function() {
+      if (otherId) {
+        window.location.href = `customer-vendor-profile.html?id=${otherId}`;
+      }
+    };
+
+    // ── Call (placeholder) ───────────────────────────────────────
+    window.callUser = function() {
+      const phone = otherUser?.phone;
+      if (phone) { window.location.href = `tel:${phone}`; }
+      else { alert('No phone number available'); }
+    };
+
+    // ── Toggle emoji (placeholder) ───────────────────────────────
+    window.toggleEmoji = function() {
+      const emojis = ['😊','😂','❤️','🙏','👍','🔥','✅','💯','🎉','👏'];
+      const input  = document.getElementById('msgInput');
+      const random = emojis[Math.floor(Math.random() * emojis.length)];
+      input.value += random;
+      input.focus();
+    };
+
+    // ── Escape HTML ──────────────────────────────────────────────
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/\n/g, '<br>');
+    }
+  </script>
+
+</body>
+</html>

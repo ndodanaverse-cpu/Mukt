@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mukoto Avenue — Payment Successful</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232E7D32' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' dominant-baseline='middle'>🛍️</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      background: #FAFAFA;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Confetti canvas ── */
+    #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+
+    /* ── Success hero ── */
+    .hero {
+      background: linear-gradient(160deg, #2E7D32 0%, #1B5E20 60%, #0A2E0A 100%);
+      padding: 60px 24px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+      z-index: 1;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; width: 300px; height: 300px;
+      border-radius: 50%;
+      background: rgba(249,168,37,0.08);
+      top: -100px; right: -80px;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; width: 200px; height: 200px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+      bottom: -60px; left: -40px;
+    }
+
+    /* Animated checkmark */
+    .check-wrap {
+      width: 100px; height: 100px;
+      background: linear-gradient(135deg, #F9A825, #F57F17);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px;
+      position: relative; z-index: 2;
+      box-shadow: 0 16px 48px rgba(249,168,37,0.5);
+      animation: popIn 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+    .check-wrap::before {
+      content: '';
+      position: absolute; inset: -10px;
+      border-radius: 50%;
+      border: 2px solid rgba(249,168,37,0.3);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .check-wrap::after {
+      content: '';
+      position: absolute; inset: -22px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(249,168,37,0.15);
+      animation: pulse 2s ease-in-out 0.3s infinite;
+    }
+    .check-icon { font-size: 46px; position: relative; z-index: 1; }
+
+    .hero-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 28px; font-weight: 800;
+      color: white; margin-bottom: 8px;
+      position: relative; z-index: 2;
+      animation: fadeUp 0.5s ease 0.3s both;
+    }
+    .hero-sub {
+      font-size: 14px; color: rgba(255,255,255,0.75);
+      position: relative; z-index: 2;
+      animation: fadeUp 0.5s ease 0.5s both;
+      line-height: 1.6;
+    }
+
+    /* Order number pill */
+    .order-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 999px; padding: 8px 18px;
+      margin-top: 16px;
+      font-size: 13px; font-weight: 700; color: white;
+      position: relative; z-index: 2;
+      animation: fadeUp 0.5s ease 0.7s both;
+    }
+    .order-pill-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #F9A825;
+      animation: blink 1.5s ease-in-out infinite;
+    }
+
+    /* ── Body ── */
+    .body {
+      flex: 1;
+      padding: 20px 16px 100px;
+      z-index: 1; position: relative;
+    }
+
+    /* Section card */
+    .card {
+      background: white; border-radius: 16px;
+      padding: 18px; margin-bottom: 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      animation: fadeUp 0.5s ease both;
+    }
+    .card:nth-child(1) { animation-delay: 0.2s; }
+    .card:nth-child(2) { animation-delay: 0.35s; }
+    .card:nth-child(3) { animation-delay: 0.5s; }
+
+    .card-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px; font-weight: 800; color: #1A1A1A;
+      margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* Order details */
+    .detail-row {
+      display: flex; justify-content: space-between;
+      align-items: center; padding: 9px 0;
+      border-bottom: 1px solid #F9FAFB;
+      font-size: 13px;
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { color: #6B7280; }
+    .detail-val { font-weight: 700; color: #1A1A1A; }
+    .detail-val.green { color: #2E7D32; }
+    .detail-val.gold { color: #F9A825; }
+
+    /* Status stepper */
+    .stepper { display: flex; flex-direction: column; gap: 0; }
+    .step-row {
+      display: flex; gap: 14px; position: relative;
+    }
+    .step-left {
+      display: flex; flex-direction: column;
+      align-items: center; width: 28px; flex-shrink: 0;
+    }
+    .step-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; flex-shrink: 0;
+      position: relative; z-index: 1;
+    }
+    .step-dot.done { background: #2E7D32; color: white; }
+    .step-dot.active {
+      background: #F9A825; color: white;
+      box-shadow: 0 0 0 4px rgba(249,168,37,0.2);
+      animation: pulseDot 2s ease-in-out infinite;
+    }
+    .step-dot.pending { background: #E5E7EB; color: #9CA3AF; }
+    .step-line {
+      width: 2px; flex: 1; min-height: 24px;
+      background: #E5E7EB; margin: 2px 0;
+    }
+    .step-line.done { background: #2E7D32; }
+    .step-content { flex: 1; padding: 4px 0 20px; }
+    .step-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px; font-weight: 700; color: #1A1A1A;
+      margin-bottom: 2px;
+    }
+    .step-title.active { color: #F9A825; }
+    .step-desc { font-size: 11px; color: #9CA3AF; }
+    .step-time { font-size: 11px; color: #9CA3AF; margin-top: 2px; font-weight: 500; }
+
+    /* Items summary */
+    .items-list { display: flex; flex-direction: column; gap: 10px; }
+    .item-row {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .item-img {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: #F3F4F6;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0; overflow: hidden;
+    }
+    .item-img img { width: 100%; height: 100%; object-fit: cover; }
+    .item-info { flex: 1; }
+    .item-name {
+      font-size: 13px; font-weight: 700; color: #1A1A1A;
+      display: -webkit-box; -webkit-line-clamp: 1; line-clamp: 1;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .item-vendor { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
+    .item-price { font-size: 13px; font-weight: 800; color: #2E7D32; }
+
+    /* ── Action buttons ── */
+    .actions { display: flex; flex-direction: column; gap: 10px; padding: 0 16px; }
+
+    .btn-primary {
+      width: 100%; padding: 16px;
+      border-radius: 14px; border: none;
+      background: linear-gradient(135deg, #2E7D32, #1B5E20);
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+      box-shadow: 0 4px 16px rgba(46,125,50,0.3);
+      text-decoration: none;
+      display: flex; align-items: center;
+      justify-content: center; gap: 8px;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(46,125,50,0.4); }
+
+    .btn-secondary {
+      width: 100%; padding: 15px;
+      border-radius: 14px;
+      border: 1.5px solid #E5E7EB;
+      background: white; color: #374151;
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+      text-decoration: none;
+      display: flex; align-items: center;
+      justify-content: center; gap: 8px;
+    }
+    .btn-secondary:hover { border-color: #2E7D32; color: #2E7D32; }
+
+    .btn-share {
+      width: 100%; padding: 14px;
+      border-radius: 14px; border: none;
+      background: #F3F4F6; color: #374151;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center;
+      justify-content: center; gap: 8px;
+    }
+    .btn-share:hover { background: #E5E7EB; }
+
+    /* ── Keyframes ── */
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.5); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%,100% { opacity:1; transform:scale(1); }
+      50%      { opacity:0.4; transform:scale(1.06); }
+    }
+    @keyframes pulseDot {
+      0%,100% { box-shadow:0 0 0 4px rgba(249,168,37,0.2); }
+      50%      { box-shadow:0 0 0 8px rgba(249,168,37,0.1); }
+    }
+    @keyframes blink {
+      0%,100% { opacity:1; } 50% { opacity:0.4; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Confetti -->
+  <canvas id="confetti"></canvas>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="check-wrap">
+      <div class="check-icon">✓</div>
+    </div>
+    <div class="hero-title">Payment Successful!</div>
+    <div class="hero-sub">Your order has been placed and the vendor<br/>has been notified. 🎉</div>
+    <div class="order-pill">
+      <div class="order-pill-dot"></div>
+      <span id="orderNumberDisplay">Order #MKT-0000</span>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="body">
+
+    <!-- Order details -->
+    <div class="card">
+      <div class="card-title">🧾 Order Details</div>
+      <div class="detail-row">
+        <div class="detail-label">Order Number</div>
+        <div class="detail-val" id="detailOrderNum">—</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Date & Time</div>
+        <div class="detail-val" id="detailDate">—</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Payment Method</div>
+        <div class="detail-val gold" id="detailPayment">—</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Amount Paid</div>
+        <div class="detail-val green" id="detailAmount">—</div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Status</div>
+        <div class="detail-val green">✅ Confirmed</div>
+      </div>
+    </div>
+
+    <!-- Order status stepper -->
+    <div class="card">
+      <div class="card-title">📦 Order Status</div>
+      <div class="stepper">
+
+        <div class="step-row">
+          <div class="step-left">
+            <div class="step-dot done">✓</div>
+            <div class="step-line done"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Order Placed</div>
+            <div class="step-desc">Your order has been received</div>
+            <div class="step-time" id="stepTime1">Just now</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left">
+            <div class="step-dot active">⏳</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title active">Awaiting Confirmation</div>
+            <div class="step-desc">Vendor is reviewing your order</div>
+            <div class="step-time">Estimated: 5–15 mins</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left">
+            <div class="step-dot pending">3</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title" style="color:#9CA3AF;">Ready for Pickup</div>
+            <div class="step-desc">Vendor will notify you when ready</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-left">
+            <div class="step-dot pending">4</div>
+          </div>
+          <div class="step-content">
+            <div class="step-title" style="color:#9CA3AF;">Fulfilled</div>
+            <div class="step-desc">Order complete</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Items ordered -->
+    <div class="card" id="itemsCard">
+      <div class="card-title">🛍️ Items Ordered</div>
+      <div class="items-list" id="itemsList"></div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="actions">
+      <a href="customer-orders.html" class="btn-primary">
+        📦 Track My Order
+      </a>
+      <a href="shared-chat-list.html" class="btn-secondary">
+        💬 Message Vendor
+      </a>
+      <a href="customer-home.html" class="btn-secondary">
+        🛍️ Continue Shopping
+      </a>
+      <button class="btn-share" onclick="shareReceipt()">
+        ↗ Share Receipt
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getFirestore, doc, getDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2vGB7iehqse--Th5wds1MoU4ZHr_DYY4",
+      authDomain: "mukoto-avenue-3758a.firebaseapp.com",
+      projectId: "mukoto-avenue-3758a",
+      storageBucket: "mukoto-avenue-3758a.firebasestorage.app",
+      messagingSenderId: "172793539743",
+      appId: "1:172793539743:web:46fae0bd5be1ecedebc6aa",
+      measurementId: "G-VN9T6FEVJ0"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    onAuthStateChanged(auth, async user => {
+      if (!user) { window.location.href = 'login.html'; return; }
+      loadSuccessPage();
+      runConfetti();
+    });
+
+    async function loadSuccessPage() {
+      const orderIds = JSON.parse(localStorage.getItem('ma_last_orders') || '[]');
+      const now      = new Date();
+      const timeStr  = now.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+      const dateStr  = now.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+
+      // Generate readable order number
+      const shortId  = orderIds[0] ? orderIds[0].substring(0,6).toUpperCase() : Math.random().toString(36).substring(2,8).toUpperCase();
+      const orderNum = `MKT-${shortId}`;
+
+      document.getElementById('orderNumberDisplay').textContent = `Order #${orderNum}`;
+      document.getElementById('detailOrderNum').textContent     = `#${orderNum}`;
+      document.getElementById('detailDate').textContent         = `${dateStr} · ${timeStr}`;
+      document.getElementById('stepTime1').textContent          = `Today at ${timeStr}`;
+
+      // Load order from Firestore if available
+      if (orderIds.length) {
+        try {
+          const snap = await getDoc(doc(db, 'orders', orderIds[0]));
+          if (snap.exists()) {
+            const order = snap.data();
+            const paymentLabels = {
+              ecocash: '💚 EcoCash',
+              onemoney: '💙 OneMoney',
+              telecash: '🧡 Telecash',
+              cash: '💵 Cash on Pickup'
+            };
+            document.getElementById('detailPayment').textContent =
+              paymentLabels[order.paymentMethod] || order.paymentMethod || '—';
+            document.getElementById('detailAmount').textContent =
+              `$${Number(order.totalAmount || 0).toFixed(2)}`;
+
+            renderItems(order.items || []);
+            return;
+          }
+        } catch (err) {
+          console.error('Order fetch error:', err);
+        }
+      }
+
+      // Fallback — read from cart total
+      const total = localStorage.getItem('ma_cart_total') || '0.00';
+      document.getElementById('detailAmount').textContent  = `$${total}`;
+      document.getElementById('detailPayment').textContent = '💚 EcoCash';
+
+      // Try reading items from localStorage backup
+      const cartBackup = JSON.parse(localStorage.getItem('ma_cart_backup') || '[]');
+      if (cartBackup.length) renderItems(cartBackup);
+    }
+
+    function renderItems(items) {
+      document.getElementById('itemsList').innerHTML = items.map(item => {
+        const emoji = catEmoji(item.category);
+        return `
+          <div class="item-row">
+            <div class="item-img">
+              ${item.image ? `<img src="${item.image}" onerror="this.style.display='none'">` : ''}
+              <span>${emoji}</span>
+            </div>
+            <div class="item-info">
+              <div class="item-name">${item.title || 'Product'} ${(item.qty||1) > 1 ? `× ${item.qty}` : ''}</div>
+              <div class="item-vendor">by ${item.vendorName || 'Vendor'}</div>
+            </div>
+            <div class="item-price">$${(Number(item.price||0) * (item.qty||1)).toFixed(2)}</div>
+          </div>`;
+      }).join('');
+    }
+
+    function catEmoji(cat) {
+      const m = { Clothing:'👕', Shoes:'👟', Accessories:'👜', Bags:'🎒', Vintage:'🕶️', Wholesale:'📦', Kids:'🧒' };
+      return m[cat] || '🛍️';
+    }
+
+    window.shareReceipt = function() {
+      const orderNum = document.getElementById('orderNumberDisplay').textContent;
+      const amount   = document.getElementById('detailAmount').textContent;
+      if (navigator.share) {
+        navigator.share({
+          title: 'Mukoto Avenue Receipt',
+          text:  `I just ordered on Mukoto Avenue! ${orderNum} · ${amount}`,
+          url:   window.location.href
+        });
+      } else {
+        navigator.clipboard.writeText(
+          `Mukoto Avenue Receipt\n${orderNum}\nAmount: ${amount}\nmukoto-avenue.com`
+        );
+        alert('Receipt copied to clipboard!');
+      }
+    };
+
+    // ── Confetti animation ───────────────────────────────────────
+    function runConfetti() {
+      const canvas  = document.getElementById('confetti');
+      const ctx     = canvas.getContext('2d');
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const colors  = ['#2E7D32','#F9A825','#4CAF50','#FFF','#F57F17','#81C784'];
+      const pieces  = Array.from({ length: 120 }, () => ({
+        x:    Math.random() * canvas.width,
+        y:    Math.random() * canvas.height - canvas.height,
+        w:    Math.random() * 10 + 5,
+        h:    Math.random() * 6 + 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        speed: Math.random() * 3 + 2,
+        angle: Math.random() * Math.PI * 2,
+        spin:  (Math.random() - 0.5) * 0.2,
+        drift: (Math.random() - 0.5) * 1.5
+      }));
+
+      let frame = 0;
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(p => {
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.angle);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = Math.max(0, 1 - frame / 180);
+          ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+          ctx.restore();
+          p.y     += p.speed;
+          p.x     += p.drift;
+          p.angle += p.spin;
+        });
+        frame++;
+        if (frame < 200) requestAnimationFrame(draw);
+        else ctx.clearRect(0,0,canvas.width,canvas.height);
+      }
+      draw();
+    }
+  </script>
+
+</body>
+</html>

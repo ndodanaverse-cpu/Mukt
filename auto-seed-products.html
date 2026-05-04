@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Auto-Seed Products</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232E7D32' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' dominant-baseline='middle'>🛍️</text></svg>" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .container {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      text-align: center;
+      max-width: 500px;
+      width: 90%;
+    }
+    h1 { color: #1f2937; margin-bottom: 10px; font-size: 24px; }
+    .spinner {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 4px solid #e5e7eb;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 20px 0;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .status { color: #6b7280; font-size: 16px; margin: 20px 0; }
+    .success { color: #2e7d32; font-weight: 600; }
+    .error { color: #ef5350; font-weight: 600; }
+    .products-list {
+      text-align: left;
+      margin-top: 20px;
+      background: #f9fafb;
+      padding: 15px;
+      border-radius: 8px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .product-item {
+      padding: 10px;
+      margin: 6px 0;
+      background: white;
+      border-left: 3px solid #667eea;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    .product-name { font-weight: 600; color: #1f2937; }
+    .product-vendor { color: #9ca3af; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📦 Setting Up Products</h1>
+    <p style="color: #6b7280; margin-bottom: 20px; font-size: 14px;">Auto-populating vendor inventory...</p>
+    <div class="spinner" id="spinner"></div>
+    <div class="status" id="status">Initializing...</div>
+    <div class="products-list" id="products"></div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2vGB7iehqse--Th5wds1MoU4ZHr_DYY4",
+      authDomain: "mukoto-avenue-3758a.firebaseapp.com",
+      projectId: "mukoto-avenue-3758a",
+      storageBucket: "mukoto-avenue-3758a.firebasestorage.app",
+      messagingSenderId: "172793539743",
+      appId: "1:172793539743:web:46fae0bd5be1ecedebc6aa",
+      measurementId: "G-VN9T6FEVJ0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const productsByVendor = {
+      "Fresh Produce Co.": [
+        { name: "Tomatoes", price: 350, stock: 100, image: "", description: "Fresh red tomatoes" },
+        { name: "Onions", price: 200, stock: 150, image: "", description: "Quality white onions" },
+        { name: "Carrots", price: 280, stock: 80, image: "", description: "Fresh orange carrots" },
+        { name: "Bananas", price: 450, stock: 120, image: "", description: "Fresh yellow bananas" },
+        { name: "Lettuce", price: 320, stock: 60, image: "", description: "Crispy green lettuce" }
+      ],
+      "Premium Fashions": [
+        { name: "Men's T-Shirt", price: 2500, stock: 50, image: "", description: "Classic cotton t-shirt" },
+        { name: "Women's Jeans", price: 4500, stock: 40, image: "", description: "Slim fit denim jeans" },
+        { name: "Casual Dress", price: 5500, stock: 35, image: "", description: "Comfortable everyday dress" },
+        { name: "Polo Shirt", price: 3200, stock: 45, image: "", description: "Premium polo shirt" },
+        { name: "Sports Jacket", price: 7800, stock: 25, image: "", description: "Lightweight sports jacket" }
+      ],
+      "Electronics Plus": [
+        { name: "Phone Case", price: 1200, stock: 200, image: "", description: "Protective phone case" },
+        { name: "USB-C Cable", price: 800, stock: 150, image: "", description: "Fast charging cable" },
+        { name: "Screen Protector", price: 600, stock: 180, image: "", description: "Tempered glass protector" },
+        { name: "Wireless Earbuds", price: 3500, stock: 60, image: "", description: "Bluetooth wireless earbuds" },
+        { name: "Phone Charger", price: 2200, stock: 90, image: "", description: "Fast USB-C charger" }
+      ]
+    };
+
+    const productsList = document.getElementById('products');
+    const statusEl = document.getElementById('status');
+    const spinner = document.getElementById('spinner');
+
+    async function startSeeding() {
+      try {
+        // Check if user is signed in
+        const user = auth.currentUser;
+        if (!user) {
+          console.log('No user, signing in anonymously...');
+          await signInAnonymously(auth);
+        }
+
+        statusEl.textContent = 'Checking existing products...';
+        
+        // Check if products already exist
+        const existingSnap = await getDocs(collection(db, 'products'));
+        if (existingSnap.size > 0) {
+          spinner.style.display = 'none';
+          statusEl.className = 'status success';
+          statusEl.textContent = `✅ Products already exist (${existingSnap.size} found). Redirecting...`;
+          setTimeout(() => window.location.href = 'customer-home.html', 2000);
+          return;
+        }
+
+        statusEl.textContent = 'Fetching vendors...';
+        let totalProducts = 0;
+
+        for (const [vendorName, products] of Object.entries(productsByVendor)) {
+          // Find vendor by name
+          const vendorQuery = query(collection(db, 'vendors'), where('shopName', '==', vendorName));
+          const vendorSnap = await getDocs(vendorQuery);
+
+          if (vendorSnap.empty) {
+            productsList.innerHTML += `<div class="product-item" style="border-left-color: #ef5350;"><div class="product-name">✗ ${vendorName} not found</div></div>`;
+            continue;
+          }
+
+          const vendorId = vendorSnap.docs[0].id;
+          statusEl.textContent = `Adding products for ${vendorName}...`;
+
+          // Add products for this vendor
+          for (const product of products) {
+            await addDoc(collection(db, 'products'), {
+              ...product,
+              vendorId: vendorId,
+              vendorName: vendorName,
+              category: "General",
+              rating: 4.5,
+              reviewCount: 0,
+              isAvailable: true,
+              images: [],
+              tags: [],
+              createdAt: serverTimestamp(),
+              updatedAt: serverTimestamp()
+            });
+            totalProducts++;
+            productsList.innerHTML += `<div class="product-item"><div class="product-name">✓ ${product.name}</div><div class="product-vendor">${vendorName}</div></div>`;
+          }
+        }
+
+        spinner.style.display = 'none';
+        statusEl.className = 'status success';
+        statusEl.textContent = `✅ Added ${totalProducts} products! Redirecting to home...`;
+        setTimeout(() => window.location.href = 'customer-home.html', 2000);
+      } catch (err) {
+        spinner.style.display = 'none';
+        statusEl.className = 'status error';
+        statusEl.textContent = `❌ Error: ${err.message}`;
+        console.error(err);
+      }
+    }
+
+    // Start seeding immediately on page load
+    window.addEventListener('load', startSeeding);
+  </script>
+</body>
+</html>

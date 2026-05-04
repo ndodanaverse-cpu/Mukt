@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mukoto Avenue — Home</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232E7D32' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' dominant-baseline='middle'>🛍️</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { min-height: 100vh; background: #FAFAFA; font-family: 'Inter', sans-serif; padding-bottom: 80px; }
+
+    @media (min-width: 768px) {
+      body { padding-bottom: 100px; }
+    }
+
+    .topbar {
+      background: linear-gradient(160deg, #2E7D32 0%, #1B5E20 100%);
+      padding: 48px 16px 16px;
+      position: sticky; top: 0; z-index: 100;
+      transform: translateY(0);
+      transition: transform 0.3s ease-out;
+    }
+
+    .topbar.hide-header {
+      transform: translateY(-100%);
+    }
+
+    @media (min-width: 768px) {
+      .topbar { padding: 56px 24px 20px; }
+    }
+
+    @media (min-width: 1024px) {
+      .topbar { padding: 64px 32px 24px; }
+    }
+    .topbar-row1 { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .location-wrap { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+    .location-label { font-size: 11px; color: rgba(255,255,255,0.6); font-weight: 500; }
+    .location-name { font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 700; color: white; display: flex; align-items: center; gap: 4px; }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .icon-btn {
+      width: 38px; height: 38px; background: rgba(255,255,255,0.15); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px; cursor: pointer; position: relative; text-decoration: none; border: none; transition: background 0.2s;
+    }
+    .icon-btn:hover { background: rgba(255,255,255,0.25); }
+    .cart-badge {
+      position: absolute; top: -2px; right: -2px; width: 17px; height: 17px;
+      background: #F9A825; border-radius: 50%; font-size: 9px; font-weight: 700;
+      color: white; display: none; align-items: center; justify-content: center; border: 2px solid #1B5E20;
+    }
+    .avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: linear-gradient(135deg, #F9A825, #F57F17);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 700; color: white; cursor: pointer;
+      font-family: 'Poppins', sans-serif; border: 2px solid rgba(255,255,255,0.3); text-decoration: none;
+    }
+    .search-wrap { position: relative; }
+    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 15px; pointer-events: none; }
+    .search-input {
+      width: 100%; padding: 12px 14px 12px 42px; border-radius: 12px; border: none;
+      background: rgba(255,255,255,0.15); color: white; font-size: 14px;
+      font-family: 'Inter', sans-serif; outline: none; transition: background 0.2s;
+    }
+    .search-input::placeholder { color: rgba(255,255,255,0.6); }
+    .search-input:focus { background: rgba(255,255,255,0.22); }
+
+    .section { padding: 16px 16px 0; }
+
+    @media (min-width: 768px) {
+      .section { padding: 20px 24px 0; }
+    }
+
+    @media (min-width: 1024px) {
+      .section { padding: 24px 32px 0; }
+    }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .section-title { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 800; color: #1A1A1A; }
+    .see-all { font-size: 12px; font-weight: 600; color: #2E7D32; text-decoration: none; }
+
+    .cats-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+    .cats-scroll::-webkit-scrollbar { display: none; }
+    .cat-chip {
+      display: flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 999px;
+      border: 1.5px solid #E5E7EB; background: white; font-size: 13px; font-weight: 600;
+      color: #374151; white-space: nowrap; cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+    }
+    .cat-chip:hover { border-color: #2E7D32; color: #2E7D32; }
+    .cat-chip.active { background: #2E7D32; border-color: #2E7D32; color: white; box-shadow: 0 4px 12px rgba(46,125,50,0.3); }
+
+    /* Banner */
+    .banner {
+      margin: 20px 20px 0; background: linear-gradient(135deg, #F9A825, #F57F17);
+      border-radius: 16px; padding: 20px; display: flex; align-items: center;
+      justify-content: space-between; overflow: hidden; position: relative;
+    }
+    .banner::before { content: ''; position: absolute; width: 120px; height: 120px; border-radius: 50%; background: rgba(255,255,255,0.12); right: -20px; top: -30px; }
+    .banner-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.8); margin-bottom: 4px; }
+    .banner-title { font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 800; color: white; line-height: 1.2; margin-bottom: 10px; }
+    .banner-btn { background: white; color: #F57F17; border: none; border-radius: 999px; padding: 8px 16px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif; }
+    .banner-emoji { font-size: 52px; position: relative; z-index: 1; }
+
+    /* Vendor cards */
+    .vendors-scroll { display: flex; gap: 14px; overflow-x: auto; padding: 0 20px 4px; scrollbar-width: none; }
+    .vendors-scroll::-webkit-scrollbar { display: none; }
+    .vendor-card { flex-shrink: 0; width: 200px; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.07); cursor: pointer; transition: all 0.2s; text-decoration: none; }
+    .vendor-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+    .vendor-img { width: 100%; height: 110px; background: linear-gradient(135deg, #e8f5e9, #c8e6c9); display: flex; align-items: center; justify-content: center; font-size: 36px; position: relative; }
+    .vendor-status { position: absolute; top: 8px; right: 8px; padding: 3px 8px; border-radius: 999px; font-size: 10px; font-weight: 700; }
+    .vendor-status.open { background: rgba(46,125,50,0.9); color: white; }
+    .vendor-status.closed { background: rgba(239,83,80,0.9); color: white; }
+    .vendor-info { padding: 12px; }
+    .vendor-name { font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 700; color: #1A1A1A; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .vendor-meta { display: flex; align-items: center; justify-content: space-between; }
+    .vendor-rating { display: flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 600; color: #374151; }
+    .vendor-dist { font-size: 11px; color: #9CA3AF; font-weight: 500; }
+    .vendor-cat { font-size: 11px; color: #6B7280; margin-top: 2px; }
+
+    /* Product grid */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      padding: 0 16px;
+    }
+
+    @media (min-width: 768px) {
+      .products-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        padding: 0 24px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .products-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        padding: 0 32px;
+      }
+    }
+
+    @media (min-width: 1440px) {
+      .products-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 16px;
+        padding: 0 40px;
+      }
+    }
+    .product-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.07); cursor: pointer; transition: all 0.2s; text-decoration: none; display: block; }
+    .product-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+    .product-img { width: 100%; aspect-ratio: 1; background: linear-gradient(135deg, #f5f5f5, #e8e8e8); display: flex; align-items: center; justify-content: center; font-size: 40px; position: relative; }
+    .product-img img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+    .product-condition { position: absolute; top: 8px; left: 8px; padding: 3px 8px; border-radius: 999px; font-size: 9px; font-weight: 700; text-transform: uppercase; }
+    .product-condition.new { background: rgba(46,125,50,0.9); color: white; }
+    .product-condition.used { background: rgba(249,168,37,0.9); color: white; }
+    .heart-btn { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; border: none; cursor: pointer; transition: all 0.2s; }
+    .heart-btn:hover { transform: scale(1.15); }
+    .heart-btn.liked { background: #fee2e2; }
+    .product-info { padding: 8px 10px 10px; }
+    .product-name { font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 700; color: #1A1A1A; margin-bottom: 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; }
+
+    @media (min-width: 768px) {
+      .product-name { font-size: 12px; }
+    }
+
+    @media (min-width: 1024px) {
+      .product-name { font-size: 13px; }
+    }
+    .product-vendor { font-size: 9px; color: #9CA3AF; margin-bottom: 4px; font-weight: 500; }
+    .product-price { font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 800; color: #2E7D32; }
+    .product-price-zwg { font-size: 9px; color: #9CA3AF; font-weight: 500; }
+
+    @media (min-width: 768px) {
+      .product-vendor { font-size: 10px; margin-bottom: 5px; }
+      .product-price { font-size: 14px; }
+      .product-price-zwg { font-size: 10px; }
+    }
+
+    @media (min-width: 1024px) {
+      .product-price { font-size: 15px; }
+    }
+
+    /* Skeleton */
+    .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .skeleton-vendor { flex-shrink: 0; width: 200px; height: 185px; border-radius: 16px; }
+    .skeleton-product { height: 220px; border-radius: 16px; }
+
+    /* Empty / error state */
+    .empty-state { text-align: center; padding: 40px 20px; display: none; }
+    .empty-state.show { display: block; }
+    .empty-emoji { font-size: 48px; margin-bottom: 12px; }
+    .empty-title { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; color: #1A1A1A; margin-bottom: 6px; }
+    .empty-desc { font-size: 13px; color: #9CA3AF; line-height: 1.6; }
+
+    /* Index error notice */
+    .index-notice {
+      margin: 12px 20px 0; background: #e3f2fd; border: 1px solid #90CAF9;
+      border-radius: 12px; padding: 12px 14px; font-size: 12px; color: #1565C0;
+      line-height: 1.6; display: none;
+    }
+    .index-notice.show { display: block; }
+    .index-notice a { color: #0D47A1; font-weight: 700; }
+
+    /* Bottom nav */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #F3F4F6; display: flex; padding: 10px 0 20px; z-index: 200; box-shadow: 0 -4px 20px rgba(0,0,0,0.06); }
+    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; text-decoration: none; transition: all 0.2s; padding: 4px 0; }
+    .nav-icon { font-size: 22px; transition: transform 0.2s; }
+    .nav-label { font-size: 10px; font-weight: 600; color: #9CA3AF; }
+    .nav-item.active .nav-label { color: #2E7D32; }
+    .nav-dot { width: 4px; height: 4px; background: #2E7D32; border-radius: 50%; display: none; }
+    .nav-item.active .nav-dot { display: block; }
+
+    .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px); padding: 12px 20px; border-radius: 12px; font-size: 13px; font-weight: 600; color: white; opacity: 0; transition: all 0.3s; z-index: 1000; box-shadow: 0 8px 24px rgba(0,0,0,0.2); max-width: 90vw; text-align: center; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { background: #2E7D32; }
+    .toast.error { background: #EF5350; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="topbar-row1">
+      <div class="location-wrap">
+        <span style="font-size:16px;">📍</span>
+        <div>
+          <div class="location-label">Your location</div>
+          <div class="location-name">Harare, Zimbabwe <span style="font-size:10px;opacity:0.7;">▾</span></div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <a href="customer-cart.html" class="icon-btn">
+          🛒
+          <div class="cart-badge" id="cartBadge" style="display:none;"></div>
+        </a>
+        <a href="shared-notifications.html" class="icon-btn">🔔</a>
+        <a href="customer-profile.html" class="avatar" id="avatarBtn">?</a>
+      </div>
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" type="text" placeholder="Search vendors, products..." id="searchInput" onfocus="window.location.href='customer-search.html'"/>
+    </div>
+  </div>
+
+  <!-- Banner -->
+  <div class="banner">
+    <div>
+      <div class="banner-label">✦ Now Live in Harare</div>
+      <div class="banner-title">Shop local,<br/>support vendors</div>
+      <button class="banner-btn" onclick="window.location.href='customer-map.html'">Explore Map →</button>
+    </div>
+    <div class="banner-emoji">🛍️</div>
+  </div>
+
+  <!-- Index error notice -->
+  <div class="index-notice" id="indexNotice">
+    ⚡ <strong>One-time setup needed:</strong> Open your browser console (F12), find the Firestore index error, and click the link inside it to create the required index. Takes 2 minutes — only needed once.
+  </div>
+
+  <!-- Categories -->
+  <div class="section" style="margin-top:20px;">
+    <div class="section-header"><div class="section-title">Categories</div></div>
+    <div class="cats-scroll">
+      <div class="cat-chip active" onclick="filterCategory('all',this)">🏷️ All</div>
+      <div class="cat-chip" onclick="filterCategory('Clothing',this)">👕 Clothing</div>
+      <div class="cat-chip" onclick="filterCategory('Shoes',this)">👟 Shoes</div>
+      <div class="cat-chip" onclick="filterCategory('Accessories',this)">👜 Accessories</div>
+      <div class="cat-chip" onclick="filterCategory('Bags',this)">🎒 Bags</div>
+      <div class="cat-chip" onclick="filterCategory('Vintage',this)">🕶️ Vintage</div>
+      <div class="cat-chip" onclick="filterCategory('Wholesale',this)">📦 Wholesale</div>
+      <div class="cat-chip" onclick="filterCategory('Kids',this)">🧒 Kids</div>
+    </div>
+  </div>
+
+  <!-- Vendors Near You -->
+  <div class="section" style="margin-top:24px;">
+    <div class="section-header">
+      <div class="section-title">Vendors Near You</div>
+      <a href="customer-map.html" class="see-all">View Map →</a>
+    </div>
+  </div>
+  <div class="vendors-scroll" id="vendorsScroll">
+    <div class="skeleton skeleton-vendor"></div>
+    <div class="skeleton skeleton-vendor"></div>
+    <div class="skeleton skeleton-vendor"></div>
+  </div>
+
+  <!-- Trending Products -->
+  <div class="section" style="margin-top:24px;margin-bottom:16px;">
+    <div class="section-header">
+      <div class="section-title">Trending Products</div>
+      <a href="customer-search.html" class="see-all">See All →</a>
+    </div>
+  </div>
+  <div class="products-grid" id="productsGrid">
+    <div class="skeleton skeleton-product"></div>
+    <div class="skeleton skeleton-product"></div>
+    <div class="skeleton skeleton-product"></div>
+    <div class="skeleton skeleton-product"></div>
+  </div>
+  <div class="empty-state" id="emptyState">
+    <div class="empty-emoji">🛍️</div>
+    <div class="empty-title">No products yet</div>
+    <div class="empty-desc">Vendors are setting up their shops.<br/>Check back soon or explore the map!</div>
+  </div>
+
+  <!-- Recommended for you -->
+  <div class="section" style="margin-top:20px;">
+    <div class="section-header"><div class="section-title">Recommended for you</div></div>
+    <div class="vendors-scroll" id="homeRecommendations">
+      <div style="padding:0 20px;color:#9CA3AF;font-size:13px;">Loading recommendations...</div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <a href="customer-home.html" class="nav-item active"><div class="nav-icon">🏠</div><div class="nav-label">Home</div><div class="nav-dot"></div></a>
+    <a href="customer-map.html" class="nav-item"><div class="nav-icon">🗺️</div><div class="nav-label">Map</div><div class="nav-dot"></div></a>
+    <a href="customer-orders.html" class="nav-item"><div class="nav-icon">📦</div><div class="nav-label">Orders</div><div class="nav-dot"></div></a>
+    <a href="shared-chat-list.html" class="nav-item"><div class="nav-icon">💬</div><div class="nav-label">Messages</div><div class="nav-dot"></div></a>
+    <a href="customer-profile.html" class="nav-item"><div class="nav-icon">👤</div><div class="nav-label">Profile</div><div class="nav-dot"></div></a>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, query, where, orderBy, limit, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2vGB7iehqse--Th5wds1MoU4ZHr_DYY4",
+      authDomain: "mukoto-avenue-3758a.firebaseapp.com",
+      projectId: "mukoto-avenue-3758a",
+      storageBucket: "mukoto-avenue-3758a.firebasestorage.app",
+      messagingSenderId: "172793539743",
+      appId: "1:172793539743:web:46fae0bd5be1ecedebc6aa",
+      measurementId: "G-VN9T6FEVJ0"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    let allProducts = [];
+    let savedItems  = JSON.parse(localStorage.getItem('ma_saved') || '[]');
+
+    // ── Auth guard ────────────────────────────────────────────────
+    onAuthStateChanged(auth, async user => {
+      if (!user) { window.location.href = 'login.html'; return; }
+
+      // Set avatar
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        if (snap.exists()) {
+          const d = snap.data();
+          const initials = ((d.firstName||'?')[0] + (d.lastName||'?')[0]).toUpperCase();
+          document.getElementById('avatarBtn').textContent = initials;
+          if (d.role === 'vendor') { window.location.href = 'vendor-dashboard.html'; return; }
+        }
+      } catch (_) {}
+
+      loadVendors();
+      loadProducts('all');
+      loadHomeRecommendations();
+      updateCartBadge();
+    });
+
+    // ── Load vendors — NO orderBy to avoid index requirement ──────
+    async function loadVendors() {
+      try {
+        // Simple query — no orderBy, no composite index needed
+        const q    = query(collection(db, 'vendors'), where('isActive', '==', true), limit(10));
+        const snap = await getDocs(q);
+        const vendors = [];
+        snap.forEach(d => vendors.push({ id: d.id, ...d.data() }));
+        renderVendors(vendors);
+      } catch (err) {
+        console.error('Vendors error:', err);
+        // Try without the where clause as absolute fallback
+        try {
+          const snap2 = await getDocs(query(collection(db, 'vendors'), limit(10)));
+          const vendors = [];
+          snap2.forEach(d => vendors.push({ id: d.id, ...d.data() }));
+          renderVendors(vendors.filter(v => v.isActive !== false));
+        } catch (e2) {
+          document.getElementById('vendorsScroll').innerHTML = `<div style="padding:0 20px;color:#9CA3AF;font-size:13px;">Could not load vendors. Check your connection.</div>`;
+        }
+      }
+    }
+
+    // ── Load products — tries with orderBy first, falls back ──────
+    async function loadProducts(category = 'all') {
+      const grid  = document.getElementById('productsGrid');
+      const empty = document.getElementById('emptyState');
+
+      // Show skeletons
+      grid.style.display = 'grid';
+      grid.innerHTML = `<div class="skeleton skeleton-product"></div><div class="skeleton skeleton-product"></div><div class="skeleton skeleton-product"></div><div class="skeleton skeleton-product"></div>`;
+      empty.classList.remove('show');
+
+      try {
+        let q;
+        // Try simplest possible query first — no orderBy to avoid index issues
+        if (category === 'all') {
+          q = query(collection(db, 'products'), where('isAvailable', '==', true), limit(20));
+        } else {
+          q = query(collection(db, 'products'), where('isAvailable', '==', true), where('category', '==', category), limit(20));
+        }
+
+        const snap = await getDocs(q);
+        allProducts = [];
+        snap.forEach(d => allProducts.push({ id: d.id, ...d.data() }));
+
+        if (!allProducts.length) {
+          // Try without isAvailable filter — catches products where field might not be set yet
+          const q2   = query(collection(db, 'products'), limit(20));
+          const snap2 = await getDocs(q2);
+          snap2.forEach(d => {
+            const data = d.data();
+            if (data.isAvailable !== false) allProducts.push({ id: d.id, ...data });
+          });
+        }
+
+        renderProducts(allProducts);
+
+      } catch (err) {
+        console.error('Products error:', err);
+        // Show index notice if it looks like an index error
+        if (err.message && err.message.includes('index')) {
+          document.getElementById('indexNotice').classList.add('show');
+        }
+        // Last resort — get all products, filter client-side
+        try {
+          const snap3 = await getDocs(collection(db, 'products'));
+          allProducts = [];
+          snap3.forEach(d => {
+            const data = d.data();
+            if (data.isAvailable !== false) allProducts.push({ id: d.id, ...data });
+          });
+          renderProducts(allProducts);
+        } catch (e3) {
+          grid.innerHTML = '';
+          empty.classList.add('show');
+        }
+      }
+
+      // ── Load homepage recommendations (MVP) ───────────────────────
+      async function loadHomeRecommendations() {
+        const el = document.getElementById('homeRecommendations');
+        try {
+          const resp = await fetch('/api/recommendations');
+          if (!resp.ok) { el.innerHTML = '<div style="padding:0 20px;color:#9CA3AF;">No recommendations available.</div>'; return; }
+          const data = await resp.json();
+          const items = data.recommendations || [];
+          if (!items.length) { el.innerHTML = '<div style="padding:0 20px;color:#9CA3AF;">No recommendations yet.</div>'; return; }
+          el.innerHTML = items.map(i => `
+            <a class="product-card" href="customer-product-detail.html?id=${i.id}">
+              <div class="product-img"><img src="${i.image||'public/images/placeholder.png'}" alt="${i.title}"></div>
+              <div class="product-info">
+                <div class="product-name">${i.title}</div>
+                <div class="product-vendor">${i.category||''}</div>
+                <div class="product-price">$${Number(i.price||0).toFixed(2)}</div>
+              </div>
+            </a>
+          `).join('');
+        } catch (err) {
+          console.error('Home recommendations error:', err);
+          el.innerHTML = '<div style="padding:0 20px;color:#9CA3AF;">Could not load recommendations.</div>';
+        }
+      }
+    }
+
+    function renderVendors(vendors) {
+      const container = document.getElementById('vendorsScroll');
+      if (!vendors.length) {
+        container.innerHTML = `<div style="padding:0 20px;color:#9CA3AF;font-size:13px;flex-shrink:0;">No vendors yet — be the first to sign up!</div>`;
+        return;
+      }
+      container.innerHTML = vendors.map(v => {
+        const emoji = catEmoji(v.category || 'Clothing');
+        return `
+          <a href="customer-vendor-profile.html?id=${v.id}" class="vendor-card">
+            <div class="vendor-img">
+              ${v.bannerPhoto ? `<img src="${v.bannerPhoto}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">` : emoji}
+              <div class="vendor-status open">● Open</div>
+            </div>
+            <div class="vendor-info">
+              <div class="vendor-name">${v.shopName || 'Vendor Shop'}</div>
+              <div class="vendor-cat">${v.category || 'General'}</div>
+              <div class="vendor-meta">
+                <div class="vendor-rating">⭐ ${v.rating ? v.rating.toFixed(1) : '—'}</div>
+                <div class="vendor-dist">${v.address ? v.address.split(',')[0] : 'Harare'}</div>
+              </div>
+            </div>
+          </a>`;
+      }).join('');
+    }
+
+    function renderProducts(products) {
+      const grid  = document.getElementById('productsGrid');
+      const empty = document.getElementById('emptyState');
+
+      if (!products.length) {
+        grid.innerHTML = '';
+        grid.style.display = 'none';
+        empty.classList.add('show');
+        return;
+      }
+
+      grid.style.display = 'grid';
+      empty.classList.remove('show');
+      grid.innerHTML = products.map(p => {
+        const isSaved = savedItems.includes(p.id);
+        const emoji   = catEmoji(p.category);
+        return `
+          <a href="customer-product-detail.html?id=${p.id}" class="product-card">
+            <div class="product-img">
+              ${p.images && p.images[0] ? `<img src="${p.images[0]}" onerror="this.style.display='none'">` : ''}
+              <span style="position:relative;z-index:0;">${emoji}</span>
+              <div class="product-condition ${p.condition==='New'?'new':'used'}">${p.condition||'Used'}</div>
+              <button class="heart-btn ${isSaved?'liked':''}" onclick="toggleSave(event,'${p.id}')">${isSaved?'❤️':'🤍'}</button>
+            </div>
+            <div class="product-info">
+              <div class="product-name">${p.title||'Product'}</div>
+              <div class="product-vendor">by ${p.vendorName||'Vendor'}</div>
+              <div class="product-price">$${Number(p.price||0).toFixed(2)}</div>
+              <div class="product-price-zwg">ZWG ${Number(p.priceZWG||(p.price*36)||0).toFixed(0)}</div>
+            </div>
+          </a>`;
+      }).join('');
+    }
+
+    window.filterCategory = async function(cat, el) {
+      document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      await loadProducts(cat);
+    };
+
+    window.toggleSave = function(e, productId) {
+      e.preventDefault(); e.stopPropagation();
+      const idx = savedItems.indexOf(productId);
+      if (idx === -1) { savedItems.push(productId); showToast('Saved ❤️', 'success'); }
+      else { savedItems.splice(idx,1); showToast('Removed', 'error'); }
+      localStorage.setItem('ma_saved', JSON.stringify(savedItems));
+      renderProducts(allProducts);
+    };
+
+    function updateCartBadge() {
+      const cart  = JSON.parse(localStorage.getItem('ma_cart') || '[]');
+      const badge = document.getElementById('cartBadge');
+      if (cart.length > 0) { badge.textContent = cart.length; badge.style.display = 'flex'; }
+    }
+
+    function catEmoji(cat) {
+      const m = { Clothing:'👕', Shoes:'👟', Accessories:'👜', Bags:'🎒', Vintage:'🕶️', Wholesale:'📦', Kids:'🧒' };
+      return m[cat] || '🛍️';
+    }
+
+    window.showToast = function(msg, type='success') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.className = `toast ${type} show`;
+      setTimeout(() => t.classList.remove('show'), 2500);
+    };
+  </script>
+
+</body>
+</html>

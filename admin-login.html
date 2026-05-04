@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Login</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232E7D32' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' dominant-baseline='middle'>🛍️</text></svg>" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    }
+    .container {
+      background: white;
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: 400px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .header h1 {
+      color: #1a1a2e;
+      font-size: 28px;
+      margin-bottom: 5px;
+    }
+    .header p {
+      color: #9ca3af;
+      font-size: 14px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      color: #374151;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #1a1a2e;
+      box-shadow: 0 0 0 3px rgba(26, 26, 46, 0.1);
+    }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: #1a1a2e;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      background: #0f1419;
+      transform: translateY(-1px);
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .btn-secondary {
+      background: #9ca3af;
+    }
+    .btn-secondary:hover {
+      background: #6b7280;
+    }
+    .status {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      display: none;
+    }
+    .status.show { display: block; }
+    .status.error {
+      background: #fee;
+      color: #c33;
+      border-left: 4px solid #c33;
+    }
+    .status.success {
+      background: #efe;
+      color: #3c3;
+      border-left: 4px solid #3c3;
+    }
+    .divider {
+      text-align: center;
+      margin: 25px 0;
+      color: #d1d5db;
+      font-size: 13px;
+    }
+    .setup-hint {
+      background: #f0f9ff;
+      border-left: 4px solid #0ea5e9;
+      padding: 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #0c4a6e;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔐 Admin Portal</h1>
+      <p>Mukoto Avenue Administration</p>
+    </div>
+
+    <div id="loginMode">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="admin@mukoto.com" />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter password" />
+      </div>
+
+      <button class="btn" onclick="handleLogin()">Login</button>
+      <button class="btn btn-secondary" onclick="switchToSetup()">Setup Admin Account</button>
+      
+      <div id="loginStatus" class="status"></div>
+
+      <div class="setup-hint" id="setupHint" style="display: none;">
+        ✓ No admin account exists. Click "Setup Admin Account" to create one.
+      </div>
+    </div>
+
+    <div id="setupMode" style="display: none;">
+      <div class="form-group">
+        <label for="setupEmail">Admin Email</label>
+        <input type="email" id="setupEmail" placeholder="admin@mukoto.com" />
+      </div>
+
+      <div class="form-group">
+        <label for="setupPassword">Password</label>
+        <input type="password" id="setupPassword" placeholder="Set password" />
+      </div>
+
+      <div class="form-group">
+        <label for="setupPassword2">Confirm Password</label>
+        <input type="password" id="setupPassword2" placeholder="Confirm password" />
+      </div>
+
+      <button class="btn" onclick="handleSetup()">Create Admin Account</button>
+      <button class="btn btn-secondary" onclick="switchToLogin()">Back to Login</button>
+
+      <div id="setupStatus" class="status"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, setDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2vGB7iehqse--Th5wds1MoU4ZHr_DYY4",
+      authDomain: "mukoto-avenue-3758a.firebaseapp.com",
+      projectId: "mukoto-avenue-3758a",
+      storageBucket: "mukoto-avenue-3758a.firebasestorage.app",
+      messagingSenderId: "172793539743",
+      appId: "1:172793539743:web:46fae0bd5be1ecedebc6aa",
+      measurementId: "G-VN9T6FEVJ0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Check if admin account exists
+    async function checkAdminExists() {
+      try {
+        const adminsRef = collection(db, 'admins');
+        const snapshot = await getDocs(adminsRef);
+        return !snapshot.empty;
+      } catch (err) {
+        return false;
+      }
+    }
+
+    // On load, check if admin exists
+    window.addEventListener('load', async () => {
+      const adminExists = await checkAdminExists();
+      const setupHint = document.getElementById('setupHint');
+      if (!adminExists) {
+        setupHint.style.display = 'block';
+      }
+    });
+
+    window.switchToSetup = async function() {
+      const adminExists = await checkAdminExists();
+      if (adminExists) {
+        showStatus('loginStatus', 'error', '❌ Admin account already exists');
+        return;
+      }
+      document.getElementById('loginMode').style.display = 'none';
+      document.getElementById('setupMode').style.display = 'block';
+    };
+
+    window.switchToLogin = function() {
+      document.getElementById('loginMode').style.display = 'block';
+      document.getElementById('setupMode').style.display = 'none';
+      document.getElementById('setupStatus').innerHTML = '';
+    };
+
+    window.handleSetup = async function() {
+      const email = document.getElementById('setupEmail').value.trim();
+      const password = document.getElementById('setupPassword').value;
+      const password2 = document.getElementById('setupPassword2').value;
+
+      if (!email || !password) {
+        showStatus('setupStatus', 'error', '❌ Email and password required');
+        return;
+      }
+
+      if (password !== password2) {
+        showStatus('setupStatus', 'error', '❌ Passwords do not match');
+        return;
+      }
+
+      if (password.length < 6) {
+        showStatus('setupStatus', 'error', '❌ Password must be at least 6 characters');
+        return;
+      }
+
+      try {
+        showStatus('setupStatus', 'error', '⏳ Creating admin account...');
+        
+        // Create Firebase Auth account
+        const userCred = await createUserWithEmailAndPassword(auth, email, password);
+        
+        // Store admin record in Firestore
+        await setDoc(doc(db, 'admins', userCred.user.uid), {
+          email: email,
+          uid: userCred.user.uid,
+          createdAt: new Date(),
+          role: 'admin'
+        });
+
+        showStatus('setupStatus', 'success', '✅ Admin account created! Logging in...');
+        setTimeout(() => window.location.href = 'admin-dashboard.html', 1500);
+      } catch (err) {
+        showStatus('setupStatus', 'error', `❌ ${err.message}`);
+      }
+    };
+
+    window.handleLogin = async function() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        showStatus('loginStatus', 'error', '❌ Email and password required');
+        return;
+      }
+
+      try {
+        showStatus('loginStatus', 'error', '⏳ Logging in...');
+        
+        const userCred = await signInWithEmailAndPassword(auth, email, password);
+        
+        // Check if user is admin
+        const adminQuery = query(collection(db, 'admins'), where('uid', '==', userCred.user.uid));
+        const adminSnap = await getDocs(adminQuery);
+
+        if (adminSnap.empty) {
+          showStatus('loginStatus', 'error', '❌ Not an admin account');
+          return;
+        }
+
+        showStatus('loginStatus', 'success', '✅ Login successful! Redirecting...');
+        setTimeout(() => window.location.href = 'admin-dashboard.html', 1500);
+      } catch (err) {
+        showStatus('loginStatus', 'error', `❌ ${err.message}`);
+      }
+    };
+
+    function showStatus(elementId, type, message) {
+      const el = document.getElementById(elementId);
+      el.className = `status show ${type}`;
+      el.textContent = message;
+    }
+  </script>
+</body>
+</html>

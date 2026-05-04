@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mukoto Avenue — Product</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232E7D32' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' text-anchor='middle' dominant-baseline='middle'>🛍️</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      background: #FAFAFA;
+      font-family: 'Inter', sans-serif;
+      padding-bottom: 100px;
+    }
+
+    /* ── Image carousel ── */
+    .carousel {
+      width: 100%; height: 340px;
+      position: relative; overflow: hidden;
+      background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
+    }
+
+    .carousel-track {
+      display: flex; height: 100%;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .carousel-slide {
+      flex-shrink: 0; width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 90px;
+      position: relative; overflow: hidden;
+    }
+    .carousel-slide img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      position: absolute; inset: 0;
+    }
+
+    /* Carousel controls */
+    .carousel-btn {
+      position: absolute; top: 50%;
+      transform: translateY(-50%);
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,0.9);
+      border-radius: 50%; border: none;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; cursor: pointer; z-index: 10;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      transition: all 0.2s;
+    }
+    .carousel-btn:hover { transform: translateY(-50%) scale(1.08); }
+    .carousel-btn.prev { left: 12px; }
+    .carousel-btn.next { right: 12px; }
+
+    /* Dots */
+    .carousel-dots {
+      position: absolute; bottom: 14px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; gap: 6px; z-index: 10;
+    }
+    .carousel-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(255,255,255,0.6); cursor: pointer;
+      transition: all 0.3s;
+    }
+    .carousel-dot.active { background: white; width: 18px; border-radius: 999px; }
+
+    /* Top buttons */
+    .top-btns {
+      position: absolute; top: 48px; left: 0; right: 0;
+      display: flex; justify-content: space-between;
+      padding: 0 14px; z-index: 10;
+    }
+    .top-btn {
+      width: 40px; height: 40px;
+      background: rgba(255,255,255,0.9);
+      border-radius: 50%; border: none;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      text-decoration: none; transition: all 0.2s;
+    }
+    .top-btn:hover { transform: scale(1.05); }
+
+    /* Condition badge on image */
+    .img-condition {
+      position: absolute; bottom: 14px; left: 14px;
+      padding: 5px 12px; border-radius: 999px;
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      z-index: 10;
+    }
+    .img-condition.new { background: rgba(46,125,50,0.92); color: white; }
+    .img-condition.used { background: rgba(249,168,37,0.92); color: white; }
+
+    /* ── Product info ── */
+    .product-body {
+      background: white;
+      border-radius: 24px 24px 0 0;
+      margin-top: -20px;
+      position: relative; z-index: 2;
+      padding: 24px 20px 0;
+    }
+
+    .price-row {
+      display: flex; align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .price-usd {
+      font-family: 'Poppins', sans-serif;
+      font-size: 28px; font-weight: 800; color: #2E7D32;
+      line-height: 1;
+    }
+    .price-zwg {
+      font-size: 13px; color: #9CA3AF;
+      margin-top: 3px;
+    }
+    .stock-badge {
+      padding: 5px 12px; border-radius: 999px;
+      font-size: 11px; font-weight: 700;
+    }
+    .stock-badge.in { background: #e8f5e9; color: #2E7D32; }
+    .stock-badge.low { background: #fff3e0; color: #E65100; }
+    .stock-badge.out { background: #fef2f2; color: #EF5350; }
+
+    .product-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 20px; font-weight: 800;
+      color: #1A1A1A; line-height: 1.3;
+      margin-bottom: 10px;
+    }
+
+    /* Tags */
+    .tags-row {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      margin-bottom: 16px;
+    }
+    .tag {
+      padding: 4px 10px; border-radius: 999px;
+      background: #F3F4F6; font-size: 11px;
+      font-weight: 600; color: #6B7280;
+    }
+
+    /* Divider */
+    .divider { height: 1px; background: #F3F4F6; margin: 16px 0; }
+
+    /* Description */
+    .desc-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px; font-weight: 700; color: #1A1A1A;
+      margin-bottom: 8px;
+    }
+    .desc-text {
+      font-size: 14px; color: #6B7280;
+      line-height: 1.75; margin-bottom: 4px;
+    }
+    .desc-more {
+      font-size: 13px; font-weight: 600; color: #2E7D32;
+      cursor: pointer; border: none; background: none;
+      padding: 0; margin-top: 4px;
+    }
+
+    /* Specs */
+    .specs-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; margin-top: 14px;
+    }
+    .spec-item {
+      background: #F9FAFB; border-radius: 12px;
+      padding: 12px 14px;
+    }
+    .spec-label { font-size: 10px; color: #9CA3AF; font-weight: 600; text-transform: uppercase; margin-bottom: 3px; }
+    .spec-val { font-size: 13px; font-weight: 700; color: #1A1A1A; }
+
+    /* ── Vendor strip ── */
+    .vendor-strip {
+      display: flex; align-items: center; gap: 14px;
+      background: #F9FAFB; border-radius: 16px;
+      padding: 14px; margin: 16px 0;
+      text-decoration: none; transition: all 0.2s;
+    }
+    .vendor-strip:hover { background: #F0FDF4; }
+    .vendor-avatar {
+      width: 50px; height: 50px; border-radius: 14px;
+      background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0; overflow: hidden;
+    }
+    .vendor-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .vendor-info { flex: 1; }
+    .vendor-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px; font-weight: 700; color: #1A1A1A;
+    }
+    .vendor-meta {
+      font-size: 12px; color: #6B7280; margin-top: 2px;
+    }
+    .vendor-arrow { font-size: 18px; color: #9CA3AF; }
+
+    /* ── Reviews ── */
+    .reviews-header {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 14px;
+    }
+    .rating-big {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .rating-num {
+      font-family: 'Poppins', sans-serif;
+      font-size: 36px; font-weight: 800; color: #1A1A1A;
+    }
+    .rating-stars { font-size: 16px; }
+    .rating-count { font-size: 12px; color: #9CA3AF; margin-top: 2px; }
+
+    .review-card {
+      background: #F9FAFB; border-radius: 14px;
+      padding: 14px; margin-bottom: 10px;
+    }
+    .review-top {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 8px;
+    }
+    .review-author-wrap { display: flex; align-items: center; gap: 8px; }
+    .review-avatar-sm {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: linear-gradient(135deg, #F9A825, #F57F17);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: white;
+    }
+    .review-name-sm { font-size: 13px; font-weight: 700; color: #1A1A1A; }
+    .review-date-sm { font-size: 11px; color: #9CA3AF; }
+    .review-stars-sm { font-size: 12px; }
+    .review-body { font-size: 13px; color: #374151; line-height: 1.6; }
+
+    .review-actions {
+      display: flex; gap: 8px; margin-top: 10px; padding-top: 10px;
+      border-top: 1px solid #E5E7EB;
+    }
+    .review-btn-sm {
+      flex: 1; padding: 8px 12px;
+      border-radius: 8px; border: 1.5px solid #E5E7EB;
+      background: white; font-size: 12px; font-weight: 600;
+      color: #6B7280; cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .review-btn-sm:hover { background: #F9FAFB; border-color: #D1D5DB; }
+    .review-btn-sm.delete:hover { background: #fef2f2; border-color: #EF5350; color: #EF5350; }
+
+    /* ── Bottom CTA bar ── */
+    .cta-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: white;
+      padding: 14px 16px 32px;
+      border-top: 1px solid #F3F4F6;
+      display: flex; gap: 12px; z-index: 200;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+    }
+    .btn-save {
+      width: 52px; height: 52px; border-radius: 14px;
+      border: 1.5px solid #E5E7EB; background: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; cursor: pointer; flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .btn-save:hover { border-color: #EF5350; background: #fef2f2; }
+    .btn-save.liked { background: #fee2e2; border-color: #EF5350; }
+
+    .btn-cart {
+      flex: 1; padding: 15px;
+      border-radius: 14px; border: none;
+      background: linear-gradient(135deg, #F9A825, #F57F17);
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+      box-shadow: 0 4px 16px rgba(249,168,37,0.4);
+      display: flex; align-items: center;
+      justify-content: center; gap: 8px;
+    }
+    .btn-cart:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(249,168,37,0.5); }
+    .btn-cart:active { transform: translateY(0); }
+    .btn-cart:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .btn-buy {
+      flex: 1; padding: 15px;
+      border-radius: 14px; border: none;
+      background: linear-gradient(135deg, #2E7D32, #1B5E20);
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+      box-shadow: 0 4px 16px rgba(46,125,50,0.35);
+    }
+    .btn-buy:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(46,125,50,0.45); }
+    .btn-buy:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* ── Skeleton ── */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite; border-radius: 12px;
+    }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 110px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      padding: 12px 20px; border-radius: 12px;
+      font-size: 13px; font-weight: 600; color: white;
+      opacity: 0; transition: all 0.3s; z-index: 1000;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      max-width: 90vw; text-align: center;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { background: #2E7D32; }
+    .toast.error { background: #EF5350; }
+    .toast.info { background: #1565C0; }
+
+    /* Qty selector */
+    .qty-row {
+      display: flex; align-items: center;
+      justify-content: space-between; margin: 16px 0 0;
+    }
+    .qty-label {
+      font-size: 13px; font-weight: 600; color: #374151;
+    }
+    .qty-control {
+      display: flex; align-items: center; gap: 0;
+      border: 1.5px solid #E5E7EB; border-radius: 12px;
+      overflow: hidden;
+    }
+    .qty-btn {
+      width: 38px; height: 38px;
+      background: #F9FAFB; border: none;
+      font-size: 18px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: #374151; transition: background 0.2s;
+    }
+    .qty-btn:hover { background: #E5E7EB; }
+    .qty-val {
+      width: 42px; text-align: center;
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px; font-weight: 700; color: #1A1A1A;
+      border-left: 1px solid #E5E7EB;
+      border-right: 1px solid #E5E7EB;
+      line-height: 38px;
+    }
+
+    /* ── Review button ── */
+    .btn-write-review {
+      padding: 10px 16px; border-radius: 12px;
+      background: #F3F4F6; border: none;
+      font-size: 12px; font-weight: 700; color: #2E7D32;
+      cursor: pointer; transition: all 0.2s;
+      margin-top: 14px;
+      width: 100%;
+    }
+    .btn-write-review:hover { background: #E5E7EB; }
+
+    /* ── Modal ── */
+    .modal {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4);
+      display: none; align-items: flex-end;
+      z-index: 9999; animation: fadeIn 0.2s;
+    }
+    .modal.open {
+      display: flex;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+
+    .modal-content {
+      background: white; width: 100%;
+      border-radius: 24px 24px 0 0;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .modal-header {
+      position: sticky; top: 0;
+      background: white;
+      padding: 20px; border-bottom: 1px solid #F3F4F6;
+      display: flex; justify-content: space-between; align-items: center;
+      z-index: 10;
+    }
+    .modal-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 18px; font-weight: 700; color: #1A1A1A;
+    }
+    .modal-close {
+      width: 32px; height: 32px;
+      background: #F3F4F6; border: none;
+      border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; transition: all 0.2s;
+    }
+    .modal-close:hover { background: #E5E7EB; }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    /* ── Review form ── */
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-label {
+      font-size: 14px; font-weight: 700; color: #1A1A1A;
+      display: block; margin-bottom: 8px;
+    }
+    .form-helper {
+      font-size: 12px; color: #9CA3AF; margin-top: 4px;
+    }
+
+    .star-picker {
+      display: flex; gap: 8px; font-size: 32px;
+    }
+    .star {
+      cursor: pointer; transition: transform 0.2s;
+    }
+    .star:hover { transform: scale(1.15); }
+    .star.active { filter: drop-shadow(0 0 4px #F9A825); }
+
+    .form-input {
+      width: 100%; padding: 12px 14px;
+      border: 1.5px solid #E5E7EB;
+      border-radius: 12px; font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      resize: vertical; min-height: 80px;
+    }
+    .form-input:focus {
+      outline: none; border-color: #2E7D32;
+      box-shadow: 0 0 0 3px rgba(46,125,50,0.1);
+    }
+
+    .char-count {
+      font-size: 12px; color: #9CA3AF;
+      text-align: right; margin-top: 4px;
+    }
+
+    .form-actions {
+      display: flex; gap: 10px; margin-top: 20px;
+    }
+    .btn-cancel {
+      flex: 1; padding: 14px;
+      border-radius: 12px; border: 1.5px solid #E5E7EB;
+      background: white; font-size: 15px; font-weight: 700;
+      color: #374151; cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      transition: all 0.2s;
+    }
+    .btn-cancel:hover { background: #F9FAFB; border-color: #D1D5DB; }
+
+    .btn-submit {
+      flex: 1; padding: 14px;
+      border-radius: 12px; border: none;
+      background: linear-gradient(135deg, #2E7D32, #1B5E20);
+      color: white; font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+      font-family: 'Poppins', sans-serif;
+      box-shadow: 0 4px 16px rgba(46,125,50,0.35);
+    }
+    .btn-submit:hover { transform: translateY(-2px); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .rating-display {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 4px;
+    }
+    .rating-value {
+      font-size: 14px; font-weight: 700; color: #1A1A1A;
+    }
+    /* Recommendations */
+    .recommend-section { margin: 18px 0 28px; }
+    .recommend-title { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+    .recommend-list { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; }
+    .recommend-card { min-width: 160px; background: white; border-radius: 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.06); padding: 10px; flex-shrink: 0; }
+    .recommend-card img { width: 100%; height: 100px; object-fit: cover; border-radius: 8px; }
+    .recommend-title-sm { font-size: 13px; font-weight: 700; margin-top: 8px; color: #111827; }
+    .recommend-price { font-size: 13px; color: #10B981; font-weight: 700; margin-top: 6px; }
+  </style>
+</head>
+<body>
+
+  <!-- Carousel -->
+  <div class="carousel" id="carousel">
+    <div class="top-btns">
+      <a href="javascript:history.back()" class="top-btn">←</a>
+      <button class="top-btn" id="shareBtn" onclick="shareProduct()">↗</button>
+    </div>
+    <div class="carousel-track" id="carouselTrack">
+      <div class="carousel-slide">
+        <div class="skeleton" style="width:100%;height:100%;border-radius:0;"></div>
+      </div>
+    </div>
+    <button class="carousel-btn prev" id="prevBtn" onclick="slide(-1)" style="display:none;">‹</button>
+    <button class="carousel-btn next" id="nextBtn" onclick="slide(1)" style="display:none;">›</button>
+    <div class="carousel-dots" id="carouselDots"></div>
+    <div class="img-condition new" id="conditionBadge" style="display:none;"></div>
+  </div>
+
+  <!-- Product body -->
+  <div class="product-body" id="productBody">
+
+    <div class="price-row">
+      <div>
+        <div class="price-usd" id="priceUsd">—</div>
+        <div class="price-zwg" id="priceZwg">—</div>
+      </div>
+      <div class="stock-badge in" id="stockBadge">In Stock</div>
+    </div>
+
+    <div class="product-title" id="productTitle">Loading...</div>
+
+    <div class="tags-row" id="tagsRow"></div>
+
+    <div class="qty-row">
+      <div class="qty-label">Quantity</div>
+      <div class="qty-control">
+        <button class="qty-btn" onclick="changeQty(-1)">−</button>
+        <div class="qty-val" id="qtyVal">1</div>
+        <button class="qty-btn" onclick="changeQty(1)">+</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="desc-title">Description</div>
+    <div class="desc-text" id="descText">Loading description...</div>
+    <button class="desc-more" id="descMore" style="display:none;" onclick="expandDesc()">Read more ↓</button>
+
+    <div class="specs-grid" id="specsGrid"></div>
+
+    <div class="divider"></div>
+
+    <!-- Vendor strip -->
+    <a href="#" class="vendor-strip" id="vendorStrip">
+      <div class="vendor-avatar" id="vendorAvatar">🏪</div>
+      <div class="vendor-info">
+        <div class="vendor-name" id="vendorName">Loading vendor...</div>
+        <div class="vendor-meta" id="vendorMeta">—</div>
+      </div>
+      <div class="vendor-arrow">›</div>
+    </a>
+
+    <div class="divider"></div>
+
+    <!-- Reviews -->
+    <div id="reviewsSection">
+      <div class="reviews-header">
+        <div class="rating-big">
+          <div class="rating-num" id="ratingNum">—</div>
+          <div>
+            <div class="rating-stars" id="ratingStars">—</div>
+            <div class="rating-count" id="ratingCount">No reviews yet</div>
+          </div>
+        </div>
+      </div>
+      <button class="btn-write-review" onclick="openReviewModal()">✏️ Write a Review</button>
+      <div id="reviewsList"></div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="recommend-section" id="recommendSection" style="display:none;">
+      <div class="recommend-title">Recommended for you</div>
+      <div id="recommendationsList" class="recommend-list"></div>
+    </div>
+
+  </div>
+
+  <!-- Review Modal -->
+  <div class="modal" id="reviewModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Write a Review</h2>
+        <button class="modal-close" onclick="closeReviewModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="reviewForm" onsubmit="submitReview(event)">
+          
+          <!-- Rating -->
+          <div class="form-group">
+            <label class="form-label">Rating</label>
+            <div class="rating-display">
+              <div class="star-picker" id="ratingPicker">
+                <span class="star" onclick="setRating(1)">⭐</span>
+                <span class="star" onclick="setRating(2)">⭐</span>
+                <span class="star" onclick="setRating(3)">⭐</span>
+                <span class="star" onclick="setRating(4)">⭐</span>
+                <span class="star" onclick="setRating(5)">⭐</span>
+              </div>
+            </div>
+            <div class="rating-value" id="ratingValue" style="display:none;">You rated <strong id="ratingText">0</strong> out of 5 stars</div>
+            <input type="hidden" id="reviewRating" name="rating" value="0">
+          </div>
+
+          <!-- Comment -->
+          <div class="form-group">
+            <label class="form-label">Your Review</label>
+            <textarea 
+              class="form-input" 
+              id="reviewComment" 
+              name="comment" 
+              placeholder="Share your experience with this shop..."
+              maxlength="500"
+              required
+            ></textarea>
+            <div class="char-count"><span id="charCount">0</span>/500</div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <button type="button" class="btn-cancel" onclick="closeReviewModal()">Cancel</button>
+            <button type="submit" class="btn-submit" id="submitReviewBtn" disabled>Submit Review</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA bar -->
+  <div class="cta-bar">
+    <button class="btn-save" id="saveBtn" onclick="toggleSave()">🤍</button>
+    <button class="btn-cart" id="cartBtn" onclick="addToCart()">🛒 Add to Cart</button>
+    <button class="btn-buy" id="buyBtn" onclick="buyNow()">Buy Now</button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getFirestore, doc, getDoc,
+      collection, query, where, getDocs, limit, addDoc, updateDoc, serverTimestamp, deleteDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2vGB7iehqse--Th5wds1MoU4ZHr_DYY4",
+      authDomain: "mukoto-avenue-3758a.firebaseapp.com",
+      projectId: "mukoto-avenue-3758a",
+      storageBucket: "mukoto-avenue-3758a.firebasestorage.app",
+      messagingSenderId: "172793539743",
+      appId: "1:172793539743:web:46fae0bd5be1ecedebc6aa",
+      measurementId: "G-VN9T6FEVJ0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    const params    = new URLSearchParams(window.location.search);
+    const productId = params.get('id');
+    let productData = null;
+    let vendorData  = null;
+    let qty         = 1;
+    let currentSlide = 0;
+    let savedItems  = JSON.parse(localStorage.getItem('ma_saved') || '[]');
+
+    // ── Auth guard ───────────────────────────────────────────────
+    onAuthStateChanged(auth, async user => {
+      if (!user) { window.location.href = 'login.html'; return; }
+      if (!productId) { window.location.href = 'customer-home.html'; return; }
+      await loadProduct();
+    });
+
+    // ── Load product ─────────────────────────────────────────────
+    async function loadProduct() {
+      try {
+        const snap = await getDoc(doc(db, 'products', productId));
+        if (!snap.exists()) { window.location.href = 'customer-home.html'; return; }
+        productData = { id: snap.id, ...snap.data() };
+        renderProduct(productData);
+        await loadVendor(productData.vendorId);
+        await loadReviews(productData.vendorId);
+        await loadRecommendations(productData);
+      } catch (err) {
+        console.error('Product load error:', err);
+      }
+    }
+
+    // ── Render product ───────────────────────────────────────────
+    function renderProduct(p) {
+      document.title = `${p.title || 'Product'} — Mukoto Avenue`;
+
+      // Images / carousel
+      const images = p.images?.length ? p.images : [];
+      buildCarousel(images, p.category);
+
+      // Condition badge
+      const cb = document.getElementById('conditionBadge');
+      cb.style.display = 'block';
+      cb.textContent   = p.condition || 'Used';
+      cb.className     = `img-condition ${p.condition === 'New' ? 'new' : 'used'}`;
+
+      // Price
+      document.getElementById('priceUsd').textContent = `$${Number(p.price || 0).toFixed(2)}`;
+      document.getElementById('priceZwg').textContent = `ZWG ${Number(p.priceZWG || (p.price * 36) || 0).toFixed(0)}`;
+
+      // Stock badge
+      const stock = p.stock || 0;
+      const sb    = document.getElementById('stockBadge');
+      if (stock === 0) {
+        sb.className = 'stock-badge out';
+        sb.textContent = 'Out of Stock';
+        document.getElementById('cartBtn').disabled = true;
+        document.getElementById('buyBtn').disabled  = true;
+      } else if (stock <= 3) {
+        sb.className = 'stock-badge low';
+        sb.textContent = `Only ${stock} left!`;
+      } else {
+        sb.className = 'stock-badge in';
+        sb.textContent = `${stock} in stock`;
+      }
+
+      // Title
+      document.getElementById('productTitle').textContent = p.title || 'Product';
+
+      // Tags
+      const tags = p.tags || [];
+      document.getElementById('tagsRow').innerHTML = tags.map(t =>
+        `<div class="tag">#${t}</div>`
+      ).join('');
+
+      // Description
+      const desc = p.description || 'No description available.';
+      const el   = document.getElementById('descText');
+      if (desc.length > 160) {
+        el.textContent = desc.substring(0, 160) + '...';
+        const moreBtn = document.getElementById('descMore');
+        moreBtn.style.display = 'block';
+        moreBtn._full = desc;
+      } else {
+        el.textContent = desc;
+      }
+
+      // Specs
+      document.getElementById('specsGrid').innerHTML = `
+        <div class="spec-item">
+          <div class="spec-label">Category</div>
+          <div class="spec-val">${p.category || '—'}</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">Condition</div>
+          <div class="spec-val">${p.condition || '—'}</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">Currency</div>
+          <div class="spec-val">USD · ZWG</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">Location</div>
+          <div class="spec-val">Harare, ZW</div>
+        </div>`;
+
+      // Save button state
+      updateSaveBtn();
+    }
+
+    // ── Carousel ─────────────────────────────────────────────────
+    function buildCarousel(images, category) {
+      const track = document.getElementById('carouselTrack');
+      const dots  = document.getElementById('carouselDots');
+      const emoji = catEmoji(category);
+
+      if (!images.length) {
+        track.innerHTML = `
+          <div class="carousel-slide">
+            <span>${emoji}</span>
+          </div>`;
+        return;
+      }
+
+      track.innerHTML = images.map(src => `
+        <div class="carousel-slide">
+          <img src="${src}" onerror="this.style.display='none'"/>
+          <span>${emoji}</span>
+        </div>`).join('');
+
+      dots.innerHTML = images.map((_, i) =>
+        `<div class="carousel-dot ${i===0?'active':''}" onclick="goToSlide(${i})"></div>`
+      ).join('');
+
+      if (images.length > 1) {
+        document.getElementById('prevBtn').style.display = 'flex';
+        document.getElementById('nextBtn').style.display = 'flex';
+      }
+    }
+
+    window.slide = function(dir) {
+      const track = document.getElementById('carouselTrack');
+      const total = track.children.length;
+      currentSlide = (currentSlide + dir + total) % total;
+      goToSlide(currentSlide);
+    };
+
+    window.goToSlide = function(idx) {
+      currentSlide = idx;
+      document.getElementById('carouselTrack').style.transform = `translateX(-${idx * 100}%)`;
+      document.querySelectorAll('.carousel-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === idx);
+      });
+    };
+
+    // ── Load vendor ──────────────────────────────────────────────
+    async function loadVendor(vendorId) {
+      if (!vendorId) return;
+      try {
+        const snap = await getDoc(doc(db, 'vendors', vendorId));
+        if (!snap.exists()) return;
+        vendorData = { id: snap.id, ...snap.data() };
+
+        const strip  = document.getElementById('vendorStrip');
+        strip.href   = `customer-vendor-profile.html?id=${vendorId}`;
+
+        const avatar = document.getElementById('vendorAvatar');
+        if (vendorData.profilePhoto) {
+          avatar.innerHTML = `<img src="${vendorData.profilePhoto}" onerror="this.style.display='none'">`;
+        } else {
+          avatar.textContent = catEmoji(vendorData.category);
+        }
+
+        document.getElementById('vendorName').textContent = vendorData.shopName || 'Shop';
+        document.getElementById('vendorMeta').textContent =
+          `⭐ ${vendorData.rating ? vendorData.rating.toFixed(1) : '—'} · ${vendorData.category || 'General'} · ${vendorData.isActive ? 'Open' : 'Closed'}`;
+      } catch (err) {
+        console.error('Vendor load error:', err);
+      }
+    }
+
+    // ── Load reviews ─────────────────────────────────────────────
+    async function loadReviews(vendorId) {
+      if (!vendorId) return;
+      try {
+        const q    = query(
+          collection(db, 'reviews'),
+          where('vendorId', '==', vendorId),
+          limit(5)
+        );
+        const snap = await getDocs(q);
+        const reviews = [];
+        snap.forEach(d => reviews.push({ id: d.id, ...d.data() }));
+
+        if (!reviews.length) return;
+
+        const avg = reviews.reduce((s, r) => s + (r.rating || 5), 0) / reviews.length;
+        document.getElementById('ratingNum').textContent   = avg.toFixed(1);
+        document.getElementById('ratingStars').textContent = '⭐'.repeat(Math.round(avg));
+        document.getElementById('ratingCount').textContent = `${reviews.length} review${reviews.length !== 1 ? 's' : ''}`;
+
+        document.getElementById('reviewsList').innerHTML = reviews.map(r => {
+          const initials = (r.customerName || 'A').substring(0, 2).toUpperCase();
+          const date = r.createdAt?.toDate
+            ? r.createdAt.toDate().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
+            : '';
+          const isOwner = auth.currentUser && r.customerId === auth.currentUser.uid;
+          const actionBtns = isOwner ? `
+            <div class="review-actions">
+              <button class="review-btn-sm delete" onclick="deleteReview('${r.id}', '${vendorId}')">🗑️ Delete</button>
+            </div>` : '';
+          
+          return `
+            <div class="review-card" id="review-${r.id}">
+              <div class="review-top">
+                <div class="review-author-wrap">
+                  <div class="review-avatar-sm">${initials}</div>
+                  <div>
+                    <div class="review-name-sm">${r.customerName || 'Customer'}</div>
+                    <div class="review-date-sm">${date}</div>
+                  </div>
+                </div>
+                <div class="review-stars-sm">${'⭐'.repeat(Math.round(r.rating || 5))}</div>
+              </div>
+              <div class="review-body">${r.comment || 'Great product!'}</div>
+              ${actionBtns}
+            </div>`;
+        }).join('');
+      } catch (err) {
+        console.error('Reviews error:', err);
+      }
+    }
+
+    // ── Load recommendations (MVP) ───────────────────────────────
+    async function loadRecommendations(product) {
+      try {
+        if (!product) return;
+        const qs = new URLSearchParams({ productId: product.id || '', category: product.category || '' });
+        const resp = await fetch(`/api/recommendations?${qs.toString()}`);
+        if (!resp.ok) return;
+        const data = await resp.json();
+        renderRecommendations(data.recommendations || []);
+      } catch (err) {
+        console.error('Recommendation load error:', err);
+      }
+    }
+
+    function renderRecommendations(items) {
+      const el = document.getElementById('recommendSection');
+      const list = document.getElementById('recommendationsList');
+      if (!items || !items.length) { el.style.display = 'none'; return; }
+      el.style.display = 'block';
+      list.innerHTML = items.map(i => `
+        <div class="recommend-card">
+          <a href="customer-product-detail.html?id=${i.id}" style="text-decoration:none;color:inherit;">
+            <img src="${i.image || 'public/images/placeholder.png'}" alt="${i.title}">
+            <div class="recommend-title-sm">${i.title}</div>
+            <div class="recommend-price">$${Number(i.price||0).toFixed(2)}</div>
+          </a>
+        </div>
+      `).join('');
+    }
+
+    // ── Quantity ─────────────────────────────────────────────────
+    window.changeQty = function(dir) {
+      const stock = productData?.stock || 99;
+      qty = Math.max(1, Math.min(stock, qty + dir));
+      document.getElementById('qtyVal').textContent = qty;
+    };
+
+    // ── Add to cart ──────────────────────────────────────────────
+    window.addToCart = function() {
+      if (!productData) return;
+      let cart = JSON.parse(localStorage.getItem('ma_cart') || '[]');
+      const idx = cart.findIndex(i => i.id === productId);
+      if (idx !== -1) {
+        cart[idx].qty = Math.min((cart[idx].qty || 1) + qty, productData.stock || 99);
+      } else {
+        cart.push({
+          id: productId,
+          title: productData.title,
+          price: productData.price,
+          priceZWG: productData.priceZWG || (productData.price * 36),
+          image: productData.images?.[0] || '',
+          vendorId: productData.vendorId,
+          vendorName: productData.vendorName || vendorData?.shopName || '',
+          condition: productData.condition,
+          qty
+        });
+      }
+      localStorage.setItem('ma_cart', JSON.stringify(cart));
+      showToast(`Added to cart 🛒 (${cart.length} item${cart.length!==1?'s':''})`, 'success');
+    };
+
+    // ── Buy now ──────────────────────────────────────────────────
+    window.buyNow = function() {
+      addToCart();
+      setTimeout(() => window.location.href = 'customer-cart.html', 600);
+    };
+
+    // ── Save / unsave ────────────────────────────────────────────
+    window.toggleSave = function() {
+      const idx = savedItems.indexOf(productId);
+      if (idx === -1) {
+        savedItems.push(productId);
+        showToast('Saved to wishlist ❤️', 'success');
+      } else {
+        savedItems.splice(idx, 1);
+        showToast('Removed from wishlist', 'error');
+      }
+      localStorage.setItem('ma_saved', JSON.stringify(savedItems));
+      updateSaveBtn();
+    };
+
+    function updateSaveBtn() {
+      const isSaved = savedItems.includes(productId);
+      const btn = document.getElementById('saveBtn');
+      btn.textContent = isSaved ? '❤️' : '🤍';
+      btn.classList.toggle('liked', isSaved);
+    }
+
+    // ── Share ────────────────────────────────────────────────────
+    window.shareProduct = function() {
+      if (navigator.share) {
+        navigator.share({
+          title: productData?.title || 'Check out this product',
+          text: `$${productData?.price} — ${productData?.title} on Mukoto Avenue`,
+          url: window.location.href
+        });
+      } else {
+        navigator.clipboard.writeText(window.location.href);
+        showToast('Link copied! 📋', 'success');
+      }
+    };
+
+    // ── Expand description ───────────────────────────────────────
+    window.expandDesc = function() {
+      const btn = document.getElementById('descMore');
+      document.getElementById('descText').textContent = btn._full;
+      btn.style.display = 'none';
+    };
+
+    // ── Helpers ──────────────────────────────────────────────────
+    function catEmoji(cat) {
+      const m = { Clothing:'👕', Shoes:'👟', Accessories:'👜', Bags:'🎒', Vintage:'🕶️', Wholesale:'📦', Kids:'🧒' };
+      return m[cat] || '🛍️';
+    }
+
+    // ── Review Modal ─────────────────────────────────────────────
+    let selectedRating = 0;
+
+    window.openReviewModal = function() {
+      if (!auth.currentUser) {
+        showToast('Please login to write a review', 'error');
+        window.location.href = 'login.html';
+        return;
+      }
+      document.getElementById('reviewModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+      resetReviewForm();
+    };
+
+    window.closeReviewModal = function() {
+      document.getElementById('reviewModal').classList.remove('open');
+      document.body.style.overflow = 'auto';
+      resetReviewForm();
+    };
+
+    function resetReviewForm() {
+      selectedRating = 0;
+      document.getElementById('reviewForm').reset();
+      document.getElementById('reviewRating').value = '0';
+      document.getElementById('ratingValue').style.display = 'none';
+      document.getElementById('submitReviewBtn').disabled = true;
+      document.getElementById('charCount').textContent = '0';
+      document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
+    };
+
+    window.setRating = function(rating) {
+      selectedRating = rating;
+      document.getElementById('reviewRating').value = rating;
+      document.getElementById('ratingText').textContent = rating;
+      document.getElementById('ratingValue').style.display = 'flex';
+      
+      document.querySelectorAll('.star').forEach((s, i) => {
+        s.classList.toggle('active', i < rating);
+      });
+
+      updateSubmitButton();
+    };
+
+    // Update char counter and submit button
+    document.addEventListener('DOMContentLoaded', () => {
+      const textarea = document.getElementById('reviewComment');
+      if (textarea) {
+        textarea.addEventListener('input', function() {
+          document.getElementById('charCount').textContent = this.value.length;
+          updateSubmitButton();
+        });
+      }
+
+      // Close modal when clicking outside
+      document.getElementById('reviewModal').addEventListener('click', function(e) {
+        if (e.target === this) closeReviewModal();
+      });
+    });
+
+    function updateSubmitButton() {
+      const hasRating = selectedRating > 0;
+      const hasComment = document.getElementById('reviewComment').value.trim().length > 0;
+      document.getElementById('submitReviewBtn').disabled = !(hasRating && hasComment);
+    }
+
+    window.submitReview = async function(e) {
+      e.preventDefault();
+
+      if (!auth.currentUser) {
+        showToast('Please login to write a review', 'error');
+        return;
+      }
+
+      if (selectedRating === 0) {
+        showToast('Please select a rating', 'error');
+        return;
+      }
+
+      const comment = document.getElementById('reviewComment').value.trim();
+      if (!comment) {
+        showToast('Please write a review', 'error');
+        return;
+      }
+
+      const submitBtn = document.getElementById('submitReviewBtn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting...';
+
+      try {
+        // Add review to Firestore
+        await addDoc(collection(db, 'reviews'), {
+          vendorId: productData.vendorId,
+          productId: productId,
+          customerId: auth.currentUser.uid,
+          customerName: auth.currentUser.displayName || 'Anonymous',
+          customerEmail: auth.currentUser.email,
+          rating: selectedRating,
+          comment: comment,
+          createdAt: serverTimestamp(),
+          status: 'approved'
+        });
+
+        // Update vendor rating
+        if (productData.vendorId) {
+          await updateVendorRating(productData.vendorId);
+        }
+
+        showToast('Review submitted successfully! ✅', 'success');
+        closeReviewModal();
+        
+        // Reload reviews
+        await loadReviews(productData.vendorId);
+        
+      } catch (err) {
+        console.error('Review submission error:', err);
+        showToast(`Error: ${err.message}`, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Review';
+      }
+    };
+
+    async function updateVendorRating(vendorId) {
+      try {
+        const q = query(collection(db, 'reviews'), where('vendorId', '==', vendorId));
+        const snap = await getDocs(q);
+        const reviews = [];
+        snap.forEach(d => reviews.push(d.data()));
+
+        if (reviews.length > 0) {
+          const avgRating = reviews.reduce((sum, r) => sum + (r.rating || 5), 0) / reviews.length;
+          
+          // Update vendor document
+          const vendorRef = doc(db, 'vendors', vendorId);
+          await updateDoc(vendorRef, {
+            rating: parseFloat(avgRating.toFixed(1)),
+            reviewCount: reviews.length,
+            updatedAt: serverTimestamp()
+          });
+        }
+      } catch (err) {
+        console.error('Error updating vendor rating:', err);
+      }
+    }
+
+    window.deleteReview = async function(reviewId, vendorId) {
+      if (!confirm('Are you sure you want to delete this review?')) return;
+
+      try {
+        await deleteDoc(doc(db, 'reviews', reviewId));
+        
+        // Update vendor rating
+        await updateVendorRating(vendorId);
+        
+        showToast('Review deleted ✓', 'success');
+        await loadReviews(vendorId);
+        
+      } catch (err) {
+        console.error('Delete error:', err);
+        showToast(`Error: ${err.message}`, 'error');
+      }
+    };
+
+    window.showToast = function(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.className = `toast ${type} show`;
+      setTimeout(() => t.classList.remove('show'), 2500);
+    };
+  </script>
+
+</body>
+</html>
